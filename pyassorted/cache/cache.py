@@ -24,6 +24,20 @@ class CacheObject(ABC):
 
 
 class LRU(CacheObject):
+    """Least Recently Used (LRU) cache implemented with collections.OrderedDict.
+
+    Examples
+    --------
+    >>> lru_cache = LRU(init_cache={"a": "a"})
+    >>> lru_cache.get("a") == "a"
+    >>> assert lru_cache.hits == 1
+
+    >>> # Init cache with LRU
+    >>> new_lru_cache = LRU(init_cache=lru_cache)
+    >>> new_lru_cache.get("a") == "a"
+    >>> assert new_lru_cache.hits == 1
+    """
+
     def __init__(
         self,
         maxsize: int = 0,
@@ -162,6 +176,53 @@ def cached(cache: Optional[Union[Type["CacheObject"], Callable]] = None):
     -------
     Callable
         Decorated function.
+
+    Examples
+    --------
+    >>> # Cache function calls
+    >>> @cached()
+    >>> def add(a: int, b: int) -> int:
+    ...     return a + b
+    >>> assert add(1, 2) == 3
+    >>> assert lru_cache.hits == 0
+    >>> assert lru_cache.misses == 1
+    >>> assert add(1, 2) == 3
+    >>> assert lru_cache.hits == 1
+    >>> assert lru_cache.misses == 1
+
+    >>> # Cache function without decorator initialization
+    >>> @cached
+    >>> def random_int(a: int, b: int) -> int:
+    ...     import random
+    ...     return random.randint(a, b)
+    >>> random_int(0, 2**32)
+    >>> assert random_int(0, 2**32) == random_int(0, 2**32)
+
+    >>> # Cache coroutine function calls
+    >>> import asyncio
+    >>> async def cached_in_coro_func():
+    >>>     @cached()
+    >>>     async def add(a: int, b: int) -> int:
+    ...         await asyncio.sleep(0)
+    ...         return a + b
+    >>>     assert await add(1, 2) == 3
+    >>>     assert lru_cache.hits == 0
+    >>>     assert lru_cache.misses == 1
+    >>>     assert await add(1, 2) == 3
+    >>>     assert lru_cache.hits == 1
+    >>>     assert lru_cache.misses == 1
+    >>> asyncio.run(cached_in_coro_func())
+
+    >>> # Cache coroutine function without decorator initialization
+    >>> async def cached_in_coro_func_without_init_decorator():
+    >>>     @cached
+    >>>     async def random_int(a: int, b: int) -> int:
+    ...         await asyncio.sleep(0)
+    ...         import random
+    ...         return random.randint(a, b)
+    >>>     await random_int(0, 2**32)
+    >>>     assert await random_int(0, 2**32) == await random_int(0, 2**32)
+    >>> asyncio.run(cached_in_coro_func_without_init_decorator())
     """
 
     if isinstance(cache, Callable):
