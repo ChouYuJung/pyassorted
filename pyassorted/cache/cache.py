@@ -3,6 +3,8 @@ from collections import OrderedDict
 from threading import RLock
 from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar, Union
 
+from pyassorted.asyncio import is_coro_func
+
 
 KeyType = TypeVar("KeyType")
 ValueType = TypeVar("ValueType")
@@ -176,7 +178,20 @@ def cached(cache: Optional[Union[Type["CacheObject"], Callable]] = None):
 
             return value
 
-        return wrapper
+        async def async_wrapper(*args, **kwargs):
+            key = make_key(args=args, kwargs=kwargs)
+            value = cache.get(key)
+
+            if value is cache.sentinel:
+                value = await func(*args, **kwargs)
+                cache.put(key, value)
+
+            return value
+
+        if is_coro_func(func):
+            return async_wrapper
+        else:
+            return wrapper
 
     else:
         if cache is None:
@@ -193,6 +208,19 @@ def cached(cache: Optional[Union[Type["CacheObject"], Callable]] = None):
 
                 return value
 
-            return wrapper
+            async def async_wrapper(*args, **kwargs):
+                key = make_key(args=args, kwargs=kwargs)
+                value = cache.get(key)
+
+                if value is cache.sentinel:
+                    value = await func(*args, **kwargs)
+                    cache.put(key, value)
+
+                return value
+
+            if is_coro_func(func):
+                return async_wrapper
+            else:
+                return wrapper
 
         return decorator

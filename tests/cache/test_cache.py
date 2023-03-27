@@ -1,4 +1,7 @@
+import asyncio
 import random
+
+import pytest
 
 from pyassorted.cache import LRU, cached
 
@@ -78,3 +81,36 @@ def test_cached_without_init_decorator():
 
     random_int(0, 2**32)
     assert random_int(0, 2**32) == random_int(0, 2**32)
+
+
+@pytest.mark.asyncio
+async def test_cached_in_coro_func():
+    """Test cached coroutine function."""
+
+    lru_cache = LRU()
+
+    @cached(lru_cache)
+    async def add(a: int, b: int) -> int:
+        await asyncio.sleep(0)
+        return a + b
+
+    assert await add(1, 2) == 3
+    assert lru_cache.hits == 0
+    assert lru_cache.misses == 1
+
+    assert await add(1, 2) == 3
+    assert lru_cache.hits == 1
+    assert lru_cache.misses == 1
+
+
+@pytest.mark.asyncio
+async def test_cached_in_coro_func_without_init_decorator():
+    """Test cached coroutine function without initiating decorator."""
+
+    @cached
+    async def random_int(a: int, b: int) -> int:
+        await asyncio.sleep(0)
+        return random.randint(a, b)
+
+    await random_int(0, 2**32)
+    assert (await random_int(0, 2**32)) == (await random_int(0, 2**32))
