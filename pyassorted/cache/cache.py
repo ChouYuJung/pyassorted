@@ -1,6 +1,7 @@
+from abc import ABC
 from collections import OrderedDict
 from threading import RLock
-from typing import Any, Dict, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar, Union
 
 
 KeyType = TypeVar("KeyType")
@@ -10,7 +11,17 @@ EmptyType = TypeVar("EmptyType")
 EMPTY_CACHE: EmptyType = object()
 
 
-class LRU(object):
+class CacheObject(ABC):
+    """Base class for cache objects."""
+
+    def get(self, key: KeyType) -> Union[ValueType, EmptyType]:
+        raise NotImplementedError
+
+    def put(self, key: KeyType, value: ValueType):
+        raise NotImplementedError
+
+
+class LRU(CacheObject):
     def __init__(
         self,
         maxsize: int = 0,
@@ -108,3 +119,68 @@ class LRU(object):
             self.cache[key] = value
             if self.maxsize > 0 and len(self.cache) > self.maxsize:
                 self.cache.popitem(last=False)
+
+
+def make_key(args: Tuple[Any], kwargs: Dict, kw_mark: Tuple[Any] = (object(),)) -> int:
+    """Make key from arguments.
+
+    Parameters
+    ----------
+    args : Tuple[Any]
+        Arguments.
+    kwargs : Dict
+        Keyword arguments.
+    kw_mark : Tuple[Any], optional
+        keyword arguments separator, by default (object(),)
+
+    Returns
+    -------
+    int
+        Hash of the key.
+    """
+
+    key = args
+    if kwargs:
+        key += kw_mark
+        for item in kwargs.items():
+            key += item
+    return hash(key)
+
+
+def cached(cache: Optional[Union[Type["CacheObject"], Callable]] = None):
+    """Least Recently Used (LRU) cache decorator.
+
+    Parameters
+    ----------
+    maxsize : int, optional
+        Maximum size of the cache, by default 0
+    sentinel : Optional[Any], optional
+        Sentinel value, by default None
+
+    Returns
+    -------
+    Callable
+        Decorator function.
+    """
+
+    if isinstance(cache, Callable):
+        pass
+
+    else:
+        if cache is None:
+            cache = LRU()
+
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                key = make_key(args=args, kwargs=kwargs)
+                value = cache.get(key)
+
+                if value is cache.sentinel:
+                    value = func(*args, **kwargs)
+                    cache.put(key, value)
+
+                return value
+
+            return wrapper
+
+        return decorator

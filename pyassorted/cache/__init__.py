@@ -1,4 +1,4 @@
-from .cache import LRU
+from .cache import LRU, cached
 
 
-__all__ = ["LRU"]
+__all__ = ["LRU", "cached"]

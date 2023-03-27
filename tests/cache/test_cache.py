@@ -1,4 +1,4 @@
-from pyassorted.cache import LRU
+from pyassorted.cache import LRU, cached
 
 
 def test_lru():
@@ -47,3 +47,19 @@ def test_lru():
     assert new_lru_cache.hits == 1
     new_lru_cache.get("b") == new_lru_cache.sentinel
     assert new_lru_cache.misses == 1
+
+
+def test_cached():
+    lru_cache = LRU()
+
+    @cached(lru_cache)
+    def add(a: int, b: int) -> int:
+        return a + b
+
+    assert add(1, 2) == 3
+    assert lru_cache.hits == 0
+    assert lru_cache.misses == 1
+
+    assert add(1, 2) == 3
+    assert lru_cache.hits == 1
+    assert lru_cache.misses == 1
