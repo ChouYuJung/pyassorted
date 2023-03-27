@@ -1,3 +1,5 @@
+import random
+
 from pyassorted.cache import LRU, cached
 
 
@@ -50,6 +52,8 @@ def test_lru():
 
 
 def test_cached():
+    """Test cached function."""
+
     lru_cache = LRU()
 
     @cached(lru_cache)
@@ -63,3 +67,14 @@ def test_cached():
     assert add(1, 2) == 3
     assert lru_cache.hits == 1
     assert lru_cache.misses == 1
+
+
+def test_cached_without_init_decorator():
+    """Test cached function without initiating decorator."""
+
+    @cached
+    def random_int(a: int, b: int) -> int:
+        return random.randint(a, b)
+
+    random_int(0, 2**32)
+    assert random_int(0, 2**32) == random_int(0, 2**32)

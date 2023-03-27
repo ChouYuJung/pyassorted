@@ -148,23 +148,35 @@ def make_key(args: Tuple[Any], kwargs: Dict, kw_mark: Tuple[Any] = (object(),)) 
 
 
 def cached(cache: Optional[Union[Type["CacheObject"], Callable]] = None):
-    """Least Recently Used (LRU) cache decorator.
+    """Decorator to cache function calls.
 
     Parameters
     ----------
-    maxsize : int, optional
-        Maximum size of the cache, by default 0
-    sentinel : Optional[Any], optional
-        Sentinel value, by default None
+    cache : Optional[Union[Type["CacheObject"], Callable]], optional
+        Cache object or function to cache, by default None.
+        If cache variable is a to-be decorated function, a LRU cache will be used.
 
     Returns
     -------
     Callable
-        Decorator function.
+        Decorated function.
     """
 
     if isinstance(cache, Callable):
-        pass
+        func: Callable = cache
+        cache = LRU()
+
+        def wrapper(*args, **kwargs):
+            key = make_key(args=args, kwargs=kwargs)
+            value = cache.get(key)
+
+            if value is cache.sentinel:
+                value = func(*args, **kwargs)
+                cache.put(key, value)
+
+            return value
+
+        return wrapper
 
     else:
         if cache is None:
