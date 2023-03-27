@@ -3,7 +3,7 @@ install_all:
 	poetry install --with dev
 
 format_code:
-	black .
+	black . --exclude docs
 
 update_packages:
 	poetry update
