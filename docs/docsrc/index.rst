@@ -11,6 +11,7 @@ User's Guide
 
    asyncio/executor
    asyncio/utils
+   cache/cache
 
 Indices and tables
 ------------------
