@@ -32,19 +32,32 @@ class FileLock(object):
         while True:
             current_time = time.time()
 
-            if not self.file_name.exists():
-                self.file_name.touch()
-                return
-
-            elif current_time - self.file_name.stat().st_mtime > self.lock_expire:
-                self.file_name.touch()
-                return
-
-            elif current_time - start_time >= self.timeout:
+            # Timeout
+            if current_time - start_time >= self.timeout:
                 raise TimeoutError(f"Timeout after {self.timeout} seconds")
 
-            else:
-                time.sleep(self.delay)
+            # Expire lock
+            if (
+                self.file_name.exists() is True
+                and current_time - self.file_name.stat().st_mtime > self.lock_expire
+            ):
+                self.file_name.touch(exist_ok=True)
+                return
+
+            # Acquire lock
+            try:
+                self.file_name.touch(exist_ok=False)
+                return
+            except FileExistsError:
+                try:
+                    if current_time - self.file_name.stat().st_mtime > self.lock_expire:
+                        self.file_name.touch(exist_ok=True)
+                        return
+                except FileNotFoundError:
+                    pass  # File is deleted by other process, try next loop
+
+            # Delay
+            time.sleep(self.delay)
 
     def release(self):
         self.file_name.unlink(missing_ok=True)

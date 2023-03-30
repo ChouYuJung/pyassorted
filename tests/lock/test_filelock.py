@@ -5,8 +5,7 @@ from typing import Dict, Optional
 from pyassorted.lock import FileLock
 
 
-# max_workers = 20 if cpu_count() > 20 else cpu_count()
-max_workers = 2
+max_workers = 20 if cpu_count() > 20 else cpu_count()
 
 
 def dict_data_add_one(d: Dict, lock: Optional["FileLock"] = None):
