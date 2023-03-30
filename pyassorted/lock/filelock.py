@@ -37,24 +37,21 @@ class FileLock(object):
                 raise TimeoutError(f"Timeout after {self.timeout} seconds")
 
             # Expire lock
-            if (
-                self.file_name.exists() is True
-                and current_time - self.file_name.stat().st_mtime > self.lock_expire
-            ):
-                self.file_name.touch(exist_ok=True)
-                return
+            try:
+                if current_time - self.file_name.stat().st_mtime > self.lock_expire:
+                    self.file_name.touch(exist_ok=False)
+                    return
+            except FileNotFoundError:
+                pass  # File is deleted by other process or not exist.
+            except FileExistsError:
+                pass  # File is created before file touching.
 
             # Acquire lock
             try:
                 self.file_name.touch(exist_ok=False)
                 return
             except FileExistsError:
-                try:
-                    if current_time - self.file_name.stat().st_mtime > self.lock_expire:
-                        self.file_name.touch(exist_ok=True)
-                        return
-                except FileNotFoundError:
-                    pass  # File is deleted by other process, try next loop
+                pass  # The priority was preempted by other processes.
 
             # Delay
             time.sleep(self.delay)
