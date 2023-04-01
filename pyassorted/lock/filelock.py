@@ -1,8 +1,11 @@
+import asyncio
 import tempfile
 import time
 import uuid
 from pathlib import Path
 from typing import Optional, Text
+
+from pyassorted.asyncio import run_func
 
 
 class FileLock(object):
@@ -26,6 +29,12 @@ class FileLock(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.release()
+
+    async def __aenter__(self):
+        await self.async_acquire()
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.async_release()
 
     def acquire(self):
         start_time = time.time()
@@ -58,6 +67,39 @@ class FileLock(object):
 
     def release(self):
         self.file_name.unlink(missing_ok=True)
+
+    async def async_acquire(self):
+        start_time = time.time()
+        while True:
+            current_time = time.time()
+
+            # Timeout
+            if current_time - start_time >= self.timeout:
+                raise TimeoutError(f"Timeout after {self.timeout} seconds")
+
+            # Expire lock
+            try:
+                file_stat = await run_func(self.file_name.stat)
+                if current_time - file_stat.st_mtime > self.lock_expire:
+                    await run_func(self.file_name.touch, exist_ok=False)
+                    return
+            except FileNotFoundError:
+                pass  # File is deleted by other process or not exist.
+            except FileExistsError:
+                pass  # File is created before file touching.
+
+            # Acquire lock
+            try:
+                await run_func(self.file_name.touch, exist_ok=False)
+                return
+            except FileExistsError:
+                pass  # The priority was preempted by other processes.
+
+            # Delay
+            await asyncio.sleep(self.delay)
+
+    async def async_release(self):
+        await run_func(self.file_name.unlink, missing_ok=True)
 
     def __del__(self):
         self.release()
