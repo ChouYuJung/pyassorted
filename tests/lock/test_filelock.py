@@ -11,6 +11,16 @@ max_workers = 20 if cpu_count() > 20 else cpu_count()
 
 
 def dict_data_add_one(d: Dict, lock: Optional["FileLock"] = None):
+    """Add one in dict data.
+
+    Parameters
+    ----------
+    d : Dict
+        The dict data.
+    lock : Optional[FileLock], optional
+        The file lock, by default None
+    """
+
     if lock is not None:
         with lock:
             o = d["data"]
@@ -21,6 +31,16 @@ def dict_data_add_one(d: Dict, lock: Optional["FileLock"] = None):
 
 
 async def async_dict_data_add_one(d: Dict, lock: Optional["FileLock"] = None):
+    """Add one in dict data.
+
+    Parameters
+    ----------
+    d : Dict
+        The dict data.
+    lock : Optional[FileLock], optional
+        The file lock, by default None
+    """
+
     if lock is not None:
         async with lock:
             o = d["data"]
@@ -32,6 +52,8 @@ async def async_dict_data_add_one(d: Dict, lock: Optional["FileLock"] = None):
 
 
 def test_file_lock():
+    """Test file lock."""
+
     total_task_num = 100
 
     # Failure of multiprocessing in race condition
@@ -54,6 +76,8 @@ def test_file_lock():
 
 @pytest.mark.asyncio
 async def test_async_file_lock():
+    """Test async file lock."""
+
     total_task_num = 100
     d = {"data": 0}
 

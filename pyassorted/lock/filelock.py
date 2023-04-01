@@ -9,6 +9,31 @@ from pyassorted.asyncio import run_func
 
 
 class FileLock(object):
+    """Soft File lock. The lock uses a file to store the lock status.
+
+    Examples
+    --------
+    >>> from concurrent.futures import ThreadPoolExecutor
+    >>> from pyassorted.lock import FileLock
+    >>>
+    >>> number = 0
+    >>> workers = 40
+    >>> tasks = 100
+    >>> lock = FileLock()
+    >>>
+    >>> def add_one():
+    ...     global number
+    ...     with lock:
+    ...         number += 1
+    >>>
+    >>> with ThreadPoolExecutor(max_workers=workers) as executor:
+    ...     futures = [executor.submit(add_one) for _ in range(tasks)]
+    ...     for future in futures:
+    >>>         future.result()
+    >>>
+    >>> assert number == tasks
+    """
+
     def __init__(
         self,
         file_name: Optional[Text] = None,
@@ -37,6 +62,14 @@ class FileLock(object):
         await self.async_release()
 
     def acquire(self):
+        """Acquire lock.
+
+        Raises
+        ------
+        TimeoutError
+            If timeout is reached.
+        """
+
         start_time = time.time()
         while True:
             current_time = time.time()
@@ -66,9 +99,19 @@ class FileLock(object):
             time.sleep(self.delay)
 
     def release(self):
+        """Release lock."""
+
         self.file_name.unlink(missing_ok=True)
 
     async def async_acquire(self):
+        """Acquire lock.
+
+        Raises
+        ------
+        TimeoutError
+            If timeout is reached.
+        """
+
         start_time = time.time()
         while True:
             current_time = time.time()
@@ -99,6 +142,8 @@ class FileLock(object):
             await asyncio.sleep(self.delay)
 
     async def async_release(self):
+        """Release lock."""
+
         await run_func(self.file_name.unlink, missing_ok=True)
 
     def __del__(self):
