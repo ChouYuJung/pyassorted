@@ -1,7 +1,7 @@
 import asyncio
 import functools
 import concurrent.futures
-from typing import Any, Awaitable, Callable, Union
+from typing import Awaitable, Callable, Union
 from typing_extensions import ParamSpec, TypeVar
 
 from pyassorted.asyncio.utils import is_coro_func
@@ -16,7 +16,7 @@ async def run_func(
     *args,
     max_workers=1,
     **kwargs,
-) -> Any:
+) -> T:
     """Run the coroutine function or run function in a thread pool.
 
     Parameters
