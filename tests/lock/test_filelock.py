@@ -1,5 +1,6 @@
 import asyncio
 import platform
+import time
 from functools import partial
 from multiprocessing import cpu_count, get_context
 from multiprocessing.managers import ValueProxy
@@ -16,35 +17,17 @@ mp_ctx_method = "fork" if platform.processor() == "arm" else None
 def add_one(num: "ValueProxy", lock: Optional["FileLock"] = None):
     if lock is not None:
         with lock:
+            time.sleep(0.001)
             o = num.get()
             n = o + 1
             num.set(n)
             print(f"{o} -> {n}")
     else:
+        time.sleep(0.001)
         o = num.get()
         n = o + 1
         num.set(n)
         print(f"{o} -> {n}")
-
-
-def dict_data_add_one(d: Dict, lock: Optional["FileLock"] = None):
-    """Add one in dict data.
-
-    Parameters
-    ----------
-    d : Dict
-        The dict data.
-    lock : Optional[FileLock], optional
-        The file lock, by default None
-    """
-
-    if lock is not None:
-        with lock:
-            o = d["data"]
-            d["data"] += 1
-            print(f"{o} -> {d['data']}")
-    else:
-        d["data"] += 1
 
 
 async def async_dict_data_add_one(d: Dict, lock: Optional["FileLock"] = None):
@@ -60,12 +43,13 @@ async def async_dict_data_add_one(d: Dict, lock: Optional["FileLock"] = None):
 
     if lock is not None:
         async with lock:
+            await asyncio.sleep(0.001)
             o = d["data"]
             d["data"] += 1
             print(f"{o} -> {d['data']}")
     else:
+        await asyncio.sleep(0.001)
         d["data"] += 1
-    await asyncio.sleep(0.001)
 
 
 def test_file_lock():
