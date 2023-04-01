@@ -1,6 +1,7 @@
 import asyncio
 from functools import partial
 from multiprocessing import cpu_count, get_context
+from multiprocessing.managers import ValueProxy
 from typing import Dict, Optional
 
 import pytest
@@ -8,6 +9,18 @@ from pyassorted.lock import FileLock
 
 
 max_workers = 20 if cpu_count() > 20 else cpu_count()
+
+
+def add_one(num: "ValueProxy", lock: Optional["FileLock"] = None):
+    if lock is not None:
+        with lock:
+            o = num.get()
+            num.set(num.get() + 1)
+            print(f"{o} -> {num.get()}")
+    else:
+        o = num.get()
+        num.set(num.get() + 1)
+        print(f"{o} -> {num.get()}")
 
 
 def dict_data_add_one(d: Dict, lock: Optional["FileLock"] = None):
@@ -58,20 +71,18 @@ def test_file_lock():
 
     # Failure of multiprocessing in race condition
     with get_context("fork").Manager() as manager:
-        d = manager.dict()
-        d["data"] = 0
+        num = manager.Value("i", 0)
         with get_context("fork").Pool(processes=max_workers) as pool:
-            pool.map(dict_data_add_one, [d] * total_task_num)
-        assert d["data"] != total_task_num  # Race condition
+            pool.map(add_one, [num] * total_task_num)
+        assert num.get() != total_task_num  # Race condition
 
     # Success with extra file lock
     lock = FileLock()
     with get_context("fork").Manager() as manager:
-        d = manager.dict()
-        d["data"] = 0
+        num = manager.Value("i", 0)
         with get_context("fork").Pool(processes=max_workers) as pool:
-            pool.map(partial(dict_data_add_one, lock=lock), [d] * total_task_num)
-        assert d["data"] == total_task_num
+            pool.map(partial(add_one, lock=lock), [num] * total_task_num)
+        assert num.get() == total_task_num
 
 
 @pytest.mark.asyncio
