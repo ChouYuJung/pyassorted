@@ -14,3 +14,4 @@ pip install pyassorted
 - pyassorted.asyncio.executor
 - pyassorted.asyncio.utils
 - pyassorted.cache.cache
+- pyassorted.lock.filelock

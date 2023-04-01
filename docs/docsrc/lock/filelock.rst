@@ -1,4 +1,4 @@
-lock.lock
+lock.filelock — File locking module
 ================
 
 FileLock
