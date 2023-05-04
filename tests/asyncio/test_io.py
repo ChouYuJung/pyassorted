@@ -22,6 +22,10 @@ def random_string(row: int = 100, length: int = 100) -> str:
     )
 
 
+def random_binary(size: int = 10000000):  # 10 MB
+    return bytearray(os.urandom(size))
+
+
 @pytest.mark.asyncio
 async def test_aio_open_text_file():
     with tempfile.TemporaryDirectory() as tmp_dir:
