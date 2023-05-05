@@ -8,22 +8,29 @@ if TYPE_CHECKING:
     from _typeshed import OpenTextMode
 
 
-class AsyncTextIOWrapper:
+class AsyncIOWrapper:
     def __init__(
-        self, path: Path, mode: "OpenTextMode" = "r", encoding: Optional[Text] = None
+        self,
+        path: Path,
+        mode: "OpenTextMode" = "r",
+        encoding: Optional[Text] = None,
+        **kwargs
     ):
         self.path = path
         self.mode = mode
         self.encoding = encoding
+        self.kwargs = kwargs
 
         self.file = None
 
     async def __aenter__(self):
-        self.file = open(self.path, mode=self.mode, encoding=self.encoding)
+        self.file = open(
+            self.path, mode=self.mode, encoding=self.encoding, **self.kwargs
+        )
         return self
 
     async def __aexit__(self, *args):
-        self.file.close()
+        self.close()
 
     def __aiter__(self):
         return self
@@ -33,6 +40,9 @@ class AsyncTextIOWrapper:
             await asyncio.sleep(0)
             return line
         raise StopAsyncIteration
+
+    def close(self) -> None:
+        return self.file.close()
 
     async def read(self, __offset: int, __whence: int = 0) -> int:
         return await run_func(self.file.seek, __offset, __whence)
@@ -56,5 +66,7 @@ class AsyncTextIOWrapper:
         return await run_func(self.file.writelines, __lines)
 
 
-def aio_open(path: Path, mode: "OpenTextMode" = "r", encoding: Optional[Text] = None):
-    return AsyncTextIOWrapper(path=path, mode=mode, encoding=encoding)
+def aio_open(
+    path: Path, mode: "OpenTextMode" = "r", encoding: Optional[Text] = None, **kwargs
+):
+    return AsyncIOWrapper(path=path, mode=mode, encoding=encoding, **kwargs)
