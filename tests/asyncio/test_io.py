@@ -13,7 +13,7 @@ target_filename = "test_io.txt"
 test_filename = "test_aio.txt"
 
 
-def random_string(row: int = 100, length: int = 100) -> str:
+def random_string(row: int = 1000, length: int = 1000) -> str:
     return "\n".join(
         [
             "".join(random.choices(string.ascii_letters + string.digits, k=length))
@@ -72,4 +72,18 @@ async def test_aio_open_text_file():
             await f.read(5)
             await f.seek(0)
             data_2 = await f.read()
+        assert data_1 == data_2
+
+        # Read line
+        with open(target_filepath, "r") as f:
+            data_1 = f.readline(0)
+        async with aio_open(test_filepath, "r") as f:
+            data_2 = await f.readline(0)
+        assert data_1 == data_2
+
+        # Read lines
+        with open(target_filepath, "r") as f:
+            data_1 = f.readlines(0)
+        async with aio_open(test_filepath, "r") as f:
+            data_2 = await f.readlines(0)
         assert data_1 == data_2
