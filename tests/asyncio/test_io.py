@@ -33,14 +33,20 @@ async def test_aio_open_text_file():
         test_filepath = Path(tmp_dir).joinpath(test_filename)
         random_text_content = random_string()
 
-        # IO Write
+        # IO write line
+        with open(target_filepath, "w") as f:
+            f.writelines(["A", "B", "C"])
+        # AIO write ine
+        async with aio_open(test_filepath, "w") as f:
+            await f.writelines(["A", "B", "C"])
+        assert os.stat(target_filepath).st_size == os.stat(test_filepath).st_size
+
+        # IO write
         with open(target_filepath, "w") as f:
             f.write(random_text_content)
-
-        # AIO Write
+        # AIO write
         async with aio_open(test_filepath, "w") as f:
             await f.write(random_text_content)
-
         assert os.stat(target_filepath).st_size == os.stat(test_filepath).st_size
 
         # Read
