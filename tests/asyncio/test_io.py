@@ -87,3 +87,44 @@ async def test_aio_open_text_file():
         async with aio_open(test_filepath, "r") as f:
             data_2 = await f.readlines(0)
         assert data_1 == data_2
+
+
+@pytest.mark.asyncio
+async def test_aio_open_binary_file():
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        target_filepath = Path(tmp_dir).joinpath(target_filename)
+        test_filepath = Path(tmp_dir).joinpath(test_filename)
+        random_binary_content = random_binary()
+
+        # IO write
+        with open(target_filepath, "wb") as f:
+            f.write(random_binary_content)
+        # AIO write
+        async with aio_open(test_filepath, "wb") as f:
+            await f.write(random_binary_content)
+        assert os.stat(target_filepath).st_size == os.stat(test_filepath).st_size
+
+        # Read
+        with open(target_filepath, "rb") as f:
+            data_1 = f.read()
+        async with aio_open(test_filepath, "rb") as f:
+            data_2 = await f.read()
+        assert data_1 == data_2
+
+        # Read with chunk
+        with open(target_filepath, "rb") as f:
+            data_1 = f.read(1024)
+        async with aio_open(test_filepath, "rb") as f:
+            data_2 = await f.read(1024)
+        assert data_1 == data_2
+
+        # Read after seek
+        with open(target_filepath, "rb") as f:
+            f.read(5)
+            f.seek(0)
+            data_1 = f.read()
+        async with aio_open(test_filepath, "rb") as f:
+            await f.read(5)
+            await f.seek(0)
+            data_2 = await f.read()
+        assert data_1 == data_2
