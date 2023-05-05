@@ -42,3 +42,28 @@ async def test_aio_open_text_file():
             await f.write(random_text_content)
 
         assert os.stat(target_filepath).st_size == os.stat(test_filepath).st_size
+
+        # Read
+        with open(target_filepath, "r") as f:
+            data_1 = f.read()
+        async with aio_open(test_filepath, "r") as f:
+            data_2 = await f.read()
+        assert data_1 == data_2
+
+        # Read with chunk
+        with open(target_filepath, "r") as f:
+            data_1 = f.read(1024)
+        async with aio_open(test_filepath, "r") as f:
+            data_2 = await f.read(1024)
+        assert data_1 == data_2
+
+        # Read after seek
+        with open(target_filepath, "r") as f:
+            f.read(5)
+            f.seek(0)
+            data_1 = f.read()
+        async with aio_open(test_filepath, "r") as f:
+            await f.read(5)
+            await f.seek(0)
+            data_2 = await f.read()
+        assert data_1 == data_2

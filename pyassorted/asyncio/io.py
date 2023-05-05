@@ -34,6 +34,9 @@ class AsyncTextIOWrapper:
             return line
         raise StopAsyncIteration
 
+    async def read(self, __offset: int, __whence: int = 0) -> int:
+        return await run_func(self.file.seek, __offset, __whence)
+
     async def read(self, __size: Optional[int] = None) -> Text:
         return await run_func(self.file.read, __size)
 
