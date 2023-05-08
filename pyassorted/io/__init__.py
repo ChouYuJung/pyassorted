@@ -1,6 +1,7 @@
 import glob
 import json
-from typing import Dict, List, Text, Union
+from pathlib import Path
+from typing import Dict, Generator, List, Text, Tuple, Union
 
 
 def merge_data(
@@ -24,6 +25,12 @@ def read_json(filepath: Text) -> Union[Dict, List]:
         return json.load(f)
 
 
-def read_json_recursively(dirpath: Text) -> Union[Dict, List]:
+def read_json_recursively(
+    dirpath: Union[Path, Text]
+) -> Generator[Tuple[Text, Union[Dict, List]], None, None]:
+    dirpath = Path(dirpath)
+    if dirpath.exists() and dirpath.is_file():
+        yield read_json(dirpath)
+        return
     for filepath in glob.iglob(f"{dirpath}/**/*.json", recursive=True):
-        yield read_json(filepath)
+        yield (filepath, read_json(filepath))
