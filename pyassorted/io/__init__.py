@@ -2,10 +2,10 @@ import copy
 import glob
 import json
 from pathlib import Path
-from typing import Dict, Generator, List, Text, Tuple, Union
+from typing import Dict, Generator, List, Optional, Text, Tuple, Union
 
 
-def merge_data(
+def merge_objects(
     obj_1: Union[Dict, List],
     obj_2: Union[Dict, List],
     inplace: bool = False,
@@ -18,7 +18,7 @@ def merge_data(
     if isinstance(out, Dict) and isinstance(obj_2, Dict):
         for _k, _v in obj_2.items():
             if _k in out:
-                out[_k] = merge_data(out[_k], _v, inplace=inplace)
+                out[_k] = merge_objects(out[_k], _v, inplace=inplace)
             else:
                 out[_k] = _v
 
@@ -29,6 +29,18 @@ def merge_data(
         raise TypeError(f"Cannot merge {type(obj_1)} with {type(obj_2)}")
 
     return out
+
+
+def merge_all_objects(
+    *objects: Union[Dict, List],
+    inplace: bool = False,
+) -> Optional[Union[Dict, List]]:
+    if not objects:
+        return None
+    obj = objects[0]
+    for other_obj in objects[1:]:
+        obj = merge_objects(obj, other_obj, inplace=inplace)
+    return obj
 
 
 def read_json(filepath: Text) -> Union[Dict, List]:
@@ -52,5 +64,5 @@ def merge_json_recursively(dirpath: Union[Path, Text]) -> Union[Dict, List]:
 
     obj = {}
     for _, _data in read_json_recursively(dirpath):
-        obj = merge_data(obj, _data)
+        obj = merge_objects(obj, _data)
     return obj
