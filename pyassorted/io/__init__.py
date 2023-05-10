@@ -55,7 +55,10 @@ def read_json_recursively(
     if dirpath.exists() and dirpath.is_file():
         yield read_json(dirpath)
         return
-    for filepath in glob.iglob(f"{dirpath}/**/*.json", recursive=True):
+    filepaths = sorted(
+        [filepath for filepath in glob.iglob(f"{dirpath}/**/*.json", recursive=True)]
+    )
+    for filepath in filepaths:
         yield (filepath, read_json(filepath))
 
 
