@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Dict, Generator, List, Optional, Text, Tuple, Union
 
+from pyassorted.asyncio.io import aio_open
+
 
 def merge_objects(
     obj_1: Union[Dict, List],
@@ -48,6 +50,12 @@ def read_json(filepath: Text) -> Union[Dict, List]:
         return json.load(f)
 
 
+async def async_read_json(filepath: Text) -> Union[Dict, List]:
+    async with aio_open(filepath, "r") as f:
+        _data = await f.read()
+        return json.loads(_data)
+
+
 def read_json_recursively(
     dirpath: Union[Path, Text]
 ) -> Generator[Tuple[Text, Union[Dict, List]], None, None]:
@@ -60,6 +68,19 @@ def read_json_recursively(
     )
     for filepath in filepaths:
         yield (filepath, read_json(filepath))
+
+
+async def async_read_json_recursively(dirpath: Union[Path, Text]):
+    dirpath = Path(dirpath)
+    if dirpath.exists() and dirpath.is_file():
+        _data = await async_read_json(dirpath)
+        yield _data
+        return
+    filepaths = sorted(
+        [filepath for filepath in glob.iglob(f"{dirpath}/**/*.json", recursive=True)]
+    )
+    for filepath in filepaths:
+        yield (filepath, (await async_read_json(filepath)))
 
 
 def merge_json_recursively(dirpath: Union[Path, Text]) -> Union[Dict, List]:

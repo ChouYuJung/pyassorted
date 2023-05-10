@@ -2,11 +2,12 @@ import json
 import pprint
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Text, Tuple, TypedDict, Union
+from typing import Dict, List, Text, TypedDict, Union
 
 import pytest
 
 from pyassorted.io import (
+    async_read_json_recursively,
     merge_all_objects,
     merge_json_recursively,
     merge_objects,
@@ -65,6 +66,15 @@ def test_merge_all_objects():
 
 def test_read_json_recursively(temp_dir_with_json_files: Path):
     filename_json_list = list(read_json_recursively(temp_dir_with_json_files))
+    assert filename_json_list
+    assert len(filename_json_list) == len(test_json_files)
+
+
+@pytest.mark.asyncio
+async def test_async_read_json_recursively(temp_dir_with_json_files: Path):
+    filename_json_list = []
+    async for filename_json in async_read_json_recursively(temp_dir_with_json_files):
+        filename_json_list.append(filename_json)
     assert filename_json_list
     assert len(filename_json_list) == len(test_json_files)
 
