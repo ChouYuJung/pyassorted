@@ -13,6 +13,7 @@ User's Guide
    asyncio/io
    asyncio/utils
    cache/cache
+   collections/sqlitedict
    lock/filelock
 
 Indices and tables

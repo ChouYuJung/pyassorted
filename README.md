@@ -20,6 +20,7 @@ pip install pyassorted
 - pyassorted.asyncio.io
 - pyassorted.asyncio.utils
 - pyassorted.cache.cache
+- pyassorted.collections.sqlitedict
 - pyassorted.lock.filelock
 
 
@@ -92,6 +93,23 @@ async def async_add(a: int, b: int) -> int:
 assert add(1, 2) == 3
 assert lru_cache.hits == 2
 assert lru_cache.misses == 1
+```
+
+### pyassorted.collections.sqlitedict ###
+
+```python
+import asyncio
+from pyassorted.collections.sqlitedict import SqliteDict
+
+sql_dict = SqliteDict(":memory:")
+sql_dict["key"] = "value"
+assert sql_dict["key"] == "value"
+
+# Asynchronous usage
+async def main():
+    await sql_dict.async_set("key", "value")
+    assert (await sql_dict.async_get("key")) == "value"
+asyncio.run(main())
 ```
 
 ### pyassorted.lock ###
