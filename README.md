@@ -21,6 +21,7 @@ pip install pyassorted
 - pyassorted.asyncio.utils
 - pyassorted.cache.cache
 - pyassorted.collections.sqlitedict
+- pyassorted.datetime
 - pyassorted.lock.filelock
 
 
@@ -110,6 +111,32 @@ async def main():
     await sql_dict.async_set("key", "value")
     assert (await sql_dict.async_get("key")) == "value"
 asyncio.run(main())
+```
+
+### pyassorted.datetime ###
+
+- aware_datetime_now
+```python
+from pyassorted.datetime import aware_datetime_now, iso_datetime_now
+
+print(aware_datetime_now())  # datetime.datetime
+print(iso_datetime_now())  # Datetime ISO String
+```
+
+- Timer
+```python
+import time
+from pyassorted.datetime import Timer
+
+timer = Timer()
+timer.click()
+time.sleep(1)
+timer.click()
+print(round(timer.read()))  # 1
+
+with timer:
+    time.sleep(1)
+print(round(timer.read()))  # 1
 ```
 
 ### pyassorted.lock ###

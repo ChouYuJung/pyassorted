@@ -14,6 +14,7 @@ User's Guide
    asyncio/utils
    cache/cache
    collections/sqlitedict
+   datetime/datetime
    lock/filelock
 
 Indices and tables
