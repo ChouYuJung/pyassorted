@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyassorted"
-version = "0.5.0"
+version = "0.6.0"
 description = "A library has light-weight assorted utils in Prue-Python."
 authors = ["Allen Chou <f1470891079@gmail.com>"]
 license = "MIT"
