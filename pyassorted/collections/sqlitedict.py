@@ -10,6 +10,25 @@ PrimitiveType = Union[str, numbers.Number]
 
 
 class SqliteDict(object):
+    """The SqliteDict class is a dictionary-like object that stores its data in a SQLite database.
+
+    Examples
+    --------
+    >>> import asyncio
+    >>> from pyassorted.collections.sqlitedict import SqliteDict
+    >>>
+    >>> sql_dict = SqliteDict(":memory:")
+    >>> sql_dict["key"] = "value"
+    >>> assert sql_dict["key"] == "value"
+    >>>
+    >>> # Asynchronous usage
+    >>> async def main():
+    ...     await sql_dict.async_set("key", "value")
+    ...     assert (await sql_dict.async_get("key")) == "value"
+    >>>
+    >>> asyncio.run(main())
+    """
+
     def __init__(
         self, sqlite_filepath: Text = ":memory:", tablename: Text = "cache", **kwargs
     ):

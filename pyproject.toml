@@ -19,6 +19,9 @@ pytest = "*"
 pytest-asyncio = "*"
 yapf = "*"
 
+[tool.poetry.group.doc.dependencies]
+sphinx = "*"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

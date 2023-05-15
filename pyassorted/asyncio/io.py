@@ -69,4 +69,41 @@ class AsyncIOWrapper:
 def aio_open(
     path: Path, mode: "OpenTextMode" = "r", encoding: Optional[Text] = None, **kwargs
 ):
+    """Wrapper for `open` that returns an async context manager.
+
+    Parameters
+    ----------
+    path : Path
+        The path to the file to open.
+    mode : OpenTextMode, optional
+        The mode to open the file in, by default "r"
+    encoding : Optional[Text], optional
+        The encoding to use, by default None
+
+    Returns
+    -------
+    AsyncIOWrapper
+        The async context manager.
+
+    Raises
+    ------
+    ValueError
+        If the mode is not a text mode.
+
+    Examples
+    --------
+    >>> import asyncio
+    >>> from pyassorted.io import aio_open
+    >>>
+    >>> async def main():
+    ...    # Write to a file
+    ...    async with aio_open("file.txt", "w") as f:
+    ...        await f.write("Hello")
+    ...    # Read file content
+    ...    async with aio_open("file.txt") as f:
+    ...        assert (await f.read()) == "Hello"
+    >>>
+    >>> asyncio.run(main())
+    """
+
     return AsyncIOWrapper(path=path, mode=mode, encoding=encoding, **kwargs)

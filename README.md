@@ -17,8 +17,11 @@ pip install pyassorted
 
 ## Modules ##
 - pyassorted.asyncio.executor
+- pyassorted.asyncio.io
 - pyassorted.asyncio.utils
 - pyassorted.cache.cache
+- pyassorted.collections.sqlitedict
+- pyassorted.datetime
 - pyassorted.lock.filelock
 
 
@@ -40,6 +43,23 @@ async def async_func() -> bool:
 async main():
     assert await run_func(normal_func) is True
     assert await run_func(async_func) is True
+
+asyncio.run(main())
+```
+
+### pyassorted.asyncio.io ###
+
+```python
+import asyncio
+from pyassorted.io import aio_open
+
+async def main():
+    # Write to a file
+    async with aio_open("file.txt", "w") as f:
+        await f.write("Hello")
+    # Read file content
+    async with aio_open("file.txt") as f:
+        assert (await f.read()) == "Hello"
 
 asyncio.run(main())
 ```
@@ -74,6 +94,49 @@ async def async_add(a: int, b: int) -> int:
 assert add(1, 2) == 3
 assert lru_cache.hits == 2
 assert lru_cache.misses == 1
+```
+
+### pyassorted.collections.sqlitedict ###
+
+```python
+import asyncio
+from pyassorted.collections.sqlitedict import SqliteDict
+
+sql_dict = SqliteDict(":memory:")
+sql_dict["key"] = "value"
+assert sql_dict["key"] == "value"
+
+# Asynchronous usage
+async def main():
+    await sql_dict.async_set("key", "value")
+    assert (await sql_dict.async_get("key")) == "value"
+asyncio.run(main())
+```
+
+### pyassorted.datetime ###
+
+- aware_datetime_now
+```python
+from pyassorted.datetime import aware_datetime_now, iso_datetime_now
+
+print(aware_datetime_now())  # datetime.datetime
+print(iso_datetime_now())  # Datetime ISO String
+```
+
+- Timer
+```python
+import time
+from pyassorted.datetime import Timer
+
+timer = Timer()
+timer.click()
+time.sleep(1)
+timer.click()
+print(round(timer.read()))  # 1
+
+with timer:
+    time.sleep(1)
+print(round(timer.read()))  # 1
 ```
 
 ### pyassorted.lock ###
