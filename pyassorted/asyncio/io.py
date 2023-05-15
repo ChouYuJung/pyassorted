@@ -92,15 +92,18 @@ def aio_open(
 
     Examples
     --------
-    >>> # Read a file
-    >>> from pyassorted.asyncio import aio_open
+    >>> import asyncio
+    >>> from pyassorted.io import aio_open
     >>>
-    >>> async with aio_open("file.txt") as f:
-    ...     print(await f.read())
+    >>> async def main():
+    ...    # Write to a file
+    ...    async with aio_open("file.txt", "w") as f:
+    ...        await f.write("Hello")
+    ...    # Read file content
+    ...    async with aio_open("file.txt") as f:
+    ...        assert (await f.read()) == "Hello"
     >>>
-    >>> # Write to a file
-    >>> async with aio_open("file.txt", "w") as f:
-    ...     await f.write("Hello, world!")
+    >>> asyncio.run(main())
     """
 
     return AsyncIOWrapper(path=path, mode=mode, encoding=encoding, **kwargs)
