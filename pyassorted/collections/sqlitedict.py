@@ -3,6 +3,8 @@ import pickle
 import sqlite3
 from typing import Any, Text, Union
 
+from pyassorted.asyncio.executor import run_func
+
 
 PrimitiveType = Union[str, numbers.Number]
 
@@ -13,7 +15,7 @@ class SqliteDict(object):
     ):
         self._sqlite_filepath = sqlite_filepath
         self._tablename = tablename
-        self._conn = sqlite3.connect(self._sqlite_filepath)
+        self._conn = sqlite3.connect(self._sqlite_filepath, check_same_thread=False)
         self._cursor = self._conn.cursor()
         self._cursor.execute(
             f"CREATE TABLE IF NOT EXISTS {self._tablename} (key TEXT PRIMARY KEY, value TEXT)"
@@ -50,6 +52,12 @@ class SqliteDict(object):
             return self[key]
         except KeyError:
             return default
+
+    async def async_set(self, key: PrimitiveType, value: Any):
+        await run_func(self.set, key=key, value=value)
+
+    async def async_get(self, key: PrimitiveType):
+        return await run_func(self.get, key=key)
 
     def validate_key(self, key: Any, raise_error: bool = True) -> bool:
         if isinstance(key, (str, numbers.Number, None)):

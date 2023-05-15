@@ -1,7 +1,10 @@
+import pytest
+
 from pyassorted.collections.sqlitedict import SqliteDict
 
 
-def test_sqlite_dict():
+@pytest.mark.asyncio
+async def test_sqlite_dict():
     key = "a"
     cache = SqliteDict()
     assert len(cache) == 0
@@ -16,6 +19,10 @@ def test_sqlite_dict():
 
     cache.set(key, 2.0)
     assert cache.get(key) == 2.0
+
+    # Asynchronous Operations
+    await cache.async_set(key, 3)
+    assert (await cache.async_get(key)) == 3
 
     # Catching Errors
     try:
