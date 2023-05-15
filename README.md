@@ -17,6 +17,7 @@ pip install pyassorted
 
 ## Modules ##
 - pyassorted.asyncio.executor
+- pyassorted.asyncio.io
 - pyassorted.asyncio.utils
 - pyassorted.cache.cache
 - pyassorted.lock.filelock
@@ -40,6 +41,23 @@ async def async_func() -> bool:
 async main():
     assert await run_func(normal_func) is True
     assert await run_func(async_func) is True
+
+asyncio.run(main())
+```
+
+### pyassorted.asyncio.io ###
+
+```python
+import asyncio
+from pyassorted.io import aio_open
+
+async def main():
+    # Write to a file
+    async with aio_open("file.txt", "w") as f:
+        await f.write("Hello")
+    # Read file content
+    async with aio_open("file.txt") as f:
+        assert (await f.read()) == "Hello"
 
 asyncio.run(main())
 ```
