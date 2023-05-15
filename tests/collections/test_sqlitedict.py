@@ -13,3 +13,6 @@ def test_sqlite_dict():
     assert cache.get(key) == 1
     assert cache.get("NO_KEY") == None
     assert cache.get("NO_KEY", "DEFAULT") == "DEFAULT"
+
+    cache.set(key, 2.0)
+    assert cache.get(key) == 2.0

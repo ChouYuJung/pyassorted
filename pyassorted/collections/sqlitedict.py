@@ -37,9 +37,12 @@ class SqliteDict(object):
         self.validate_key(key=key)
         value_bytes = pickle.dumps(value)
         self._cursor.execute(
-            f"INSERT INTO {self._tablename} (key, value) VALUES (?, ?)",
+            f"INSERT OR REPLACE INTO {self._tablename} (key, value) VALUES (?, ?)",
             (key, value_bytes),
         )
+
+    def set(self, key: PrimitiveType, value: Any):
+        self[key] = value
 
     def get(self, key: PrimitiveType, default: Any = None) -> Any:
         self.validate_key(key=key)
