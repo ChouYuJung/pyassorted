@@ -16,3 +16,15 @@ def test_sqlite_dict():
 
     cache.set(key, 2.0)
     assert cache.get(key) == 2.0
+
+    # Catching Errors
+    try:
+        cache["NO_KEY"]
+        assert False
+    except KeyError:
+        pass
+    try:
+        cache[{"GG"}] = 5
+        assert False
+    except TypeError:
+        pass
