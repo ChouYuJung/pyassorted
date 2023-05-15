@@ -10,8 +10,11 @@ User's Guide
    :maxdepth: 2
 
    asyncio/executor
+   asyncio/io
    asyncio/utils
    cache/cache
+   collections/sqlitedict
+   datetime/datetime
    lock/filelock
 
 Indices and tables
