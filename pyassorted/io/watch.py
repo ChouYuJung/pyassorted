@@ -1,23 +1,25 @@
+import asyncio
 import time
 from pathlib import Path
-from typing import Generator, Text, Union
+from typing import AsyncGenerator, Generator, Text, Union
 
 
-def watch(
-    filepath: Union[Path, Text], frequency: float = 0.1
-) -> Generator[Union[Path, Text], None, None]:
+PathText = Union[Path, Text]
+
+
+def watch(filepath: PathText, frequency: float = 0.1) -> Generator[Path, None, None]:
     """Watch a file for changes.
 
     Parameters
     ----------
-    filepath : Union[Path, Text]
+    filepath : PathText
         Path to file to watch.
     frequency : float, optional
         Frequency to check for changes, by default 0.1
 
     Yields
     ------
-    Union[Path, Text]
+    PathText
         Path to file that has changed.
 
     Examples
@@ -39,3 +41,39 @@ def watch(
             yield filepath
         else:
             time.sleep(frequency)
+
+
+async def async_watch(
+    filepath: PathText, frequency: float = 0.1
+) -> AsyncGenerator[Path, None]:
+    """Watch a file for changes.
+
+    Parameters
+    ----------
+    filepath : PathText
+        Path to file to watch.
+    frequency : float, optional
+        Frequency to check for changes, by default 0.1
+
+    Examples
+    --------
+    >>> import asyncio
+    >>> from pyassorted.io import watch
+    >>> async def main():
+    ...     async for filepath in async_watch("test.txt"):
+    ...         print(filepath)
+    >>> asyncio.run(main())
+    """
+
+    filepath = Path(filepath)
+    if not filepath.exists():
+        raise FileNotFoundError(f"Path '{filepath}' does not exist.")
+    file_mtime = filepath.stat().st_mtime
+
+    while True:
+        file_mtime_now = filepath.stat().st_mtime
+        if file_mtime_now != file_mtime:
+            file_mtime = file_mtime_now
+            yield filepath
+        else:
+            await asyncio.sleep(frequency)
