@@ -28,6 +28,8 @@ def watch(
     """
 
     filepath = Path(filepath)
+    if not filepath.exists():
+        raise FileNotFoundError(f"Path '{filepath}' does not exist.")
     file_mtime = filepath.stat().st_mtime
 
     while True:
