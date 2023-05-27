@@ -22,12 +22,17 @@ pip install pyassorted
 - pyassorted.cache.cache
 - pyassorted.collections.sqlitedict
 - pyassorted.datetime
+- pyassorted.io.watch
 - pyassorted.lock.filelock
 
 
-## Examples ##
+## Modules Description and Usages ##
 
 ### pyassorted.asyncio ###
+
+This Python module, `pyassorted.asyncio`, provides utility functions to facilitate easier and more effective asynchronous programming using Python's built-in `asyncio` library.
+
+It provides a level of abstraction over some of the complexities of the `asyncio` and `concurrent.futures` library.
 
 ```python
 import asyncio
@@ -49,6 +54,8 @@ asyncio.run(main())
 
 ### pyassorted.asyncio.io ###
 
+The `aio_open` function serves as a replacement for Python's built-in open function, creating an instance of the `AsyncIOWrapper` when invoked. It is designed to work in an async with block and follows a similar interface to the standard `open` function.
+
 ```python
 import asyncio
 from pyassorted.io import aio_open
@@ -65,6 +72,10 @@ asyncio.run(main())
 ```
 
 ### pyassorted.cache ###
+
+`pyassorted.cache` is a Python module that provides an interface for caching data to enhance performance by reducing expensive or time-consuming function calls and computations.
+
+It includes the implementation of the Least Recently Used (LRU) cache policy and a `cached` decorator for easy application of caching to any function or coroutine function.
 
 ```python
 import asyncio
@@ -98,6 +109,12 @@ assert lru_cache.misses == 1
 
 ### pyassorted.collections.sqlitedict ###
 
+The `pyassorted.collections.sqlitedict` module provides a dictionary-like interface to SQLite databases. This can be used as a persistent dictionary for Python objects, where keys are restricted to primitive types such as strings and numbers.
+
+The SqliteDict class supports common dictionary operations like getting, setting, and determining the length, with the added feature of enabling these operations asynchronously.
+
+The `async_set` and `async_get` methods use an asynchronous execution pattern, which can be very useful in applications with high IO operations, like web or network servers.
+
 ```python
 import asyncio
 from pyassorted.collections.sqlitedict import SqliteDict
@@ -114,6 +131,17 @@ asyncio.run(main())
 ```
 
 ### pyassorted.datetime ###
+
+
+The `pyassorted.datetime` module offers various utilities for managing and interacting with date and time in Python.
+
+This module comprises two primary functions: `aware_datetime_now` and `iso_datetime_now`. The `aware_datetime_now` function provides the current datetime in a specified timezone, using pytz's timezone conversions for enhanced accuracy.
+
+If no timezone is specified, it defaults to UTC. `iso_datetime_now` builds on `aware_datetime_now` and delivers the current datetime in ISO 8601 string format.
+
+The module also features a `Timer` class, a versatile tool to measure elapsed time. It provides simple methods like `click` to start or mark time, `read` to read the elapsed time, and `reset` to start anew. The `Timer` class is also designed as a context manager, which allows it to be used efficiently within with statements.
+
+These utilities make the `pyassorted.datetime` module a versatile tool for managing and measuring time in your Python applications.
 
 - aware_datetime_now
 ```python
@@ -139,7 +167,36 @@ with timer:
 print(round(timer.read()))  # 1
 ```
 
+### pyassorted.io.watch ###
+
+The `pyassorted.io.watch` module provides functionality to monitor files for changes. It includes two main functions: `watch` and `async_watch`. The `watch` function is a synchronous generator that continuously checks for modifications in a specified file and yields the file path whenever changes are detected.
+
+The `async_watch` function, on the other hand, is an asynchronous generator doing the same but built for asynchronous programming.
+
+```python
+import asyncio
+from pyassorted.io import async_watch, watch
+
+def watch_file(filepath):
+    for file in watch(filepath):
+        print("File changed!")
+
+async def async_watch_file(filepath):
+    async for file in async_watch(filepath):
+        print("File changed!")
+
+filepath = "modifying_file.txt"
+watch_file(filepath)
+async_watch_file(filepath)
+```
+
 ### pyassorted.lock ###
+
+The `pyassorted.lock` module provides a soft file locking mechanism, ensuring that only one process can access a shared resource at a time.
+
+Utilizing a lock file for status tracking, it facilitates both synchronous and asynchronous resource protection in multi-threaded and multi-process environments. Key features include adjustable timeouts, lock expiration, and custom lock file naming.
+
+This module, compatible with standard and async context managers, can be seamlessly integrated into your project to maintain data consistency in concurrent operations.
 
 ```python
 from concurrent.futures import ThreadPoolExecutor

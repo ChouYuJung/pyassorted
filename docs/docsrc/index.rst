@@ -15,6 +15,7 @@ User's Guide
    cache/cache
    collections/sqlitedict
    datetime/datetime
+   io/watch
    lock/filelock
 
 Indices and tables

@@ -4,7 +4,11 @@ import json
 from pathlib import Path
 from typing import Dict, Generator, List, Optional, Text, Tuple, Union
 
+from .watch import async_watch, watch
 from pyassorted.asyncio.io import aio_open
+
+
+__all__ = ["async_watch", "watch"]
 
 
 def merge_objects(
