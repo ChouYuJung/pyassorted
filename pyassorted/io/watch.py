@@ -1,13 +1,17 @@
 import asyncio
 import time
 from pathlib import Path
-from typing import AsyncGenerator, Generator, Text, Union
+from typing import AsyncGenerator, Generator, Text, Tuple, Union
 
 
 PathText = Union[Path, Text]
 
 
-def watch(filepath: PathText, period: float = 0.1) -> Generator[Path, None, None]:
+def watch(
+    filepath: PathText,
+    period: float = 0.1,
+    raise_timeout_errors: Tuple = (TimeoutError,),
+) -> Generator[Path, None, None]:
     """Watch a file for changes.
 
     Parameters
@@ -35,16 +39,21 @@ def watch(filepath: PathText, period: float = 0.1) -> Generator[Path, None, None
     file_mtime = filepath.stat().st_mtime
 
     while True:
-        file_mtime_now = filepath.stat().st_mtime
-        if file_mtime_now != file_mtime:
-            file_mtime = file_mtime_now
-            yield filepath
-        else:
-            time.sleep(period)
+        try:
+            file_mtime_now = filepath.stat().st_mtime
+            if file_mtime_now != file_mtime:
+                file_mtime = file_mtime_now
+                yield filepath
+            else:
+                time.sleep(period)
+        except raise_timeout_errors as e:
+            raise e
 
 
 async def async_watch(
-    filepath: PathText, period: float = 0.1
+    filepath: PathText,
+    period: float = 0.1,
+    raise_timeout_errors: Tuple = (TimeoutError,),
 ) -> AsyncGenerator[Path, None]:
     """Watch a file for changes.
 
@@ -71,9 +80,12 @@ async def async_watch(
     file_mtime = filepath.stat().st_mtime
 
     while True:
-        file_mtime_now = filepath.stat().st_mtime
-        if file_mtime_now != file_mtime:
-            file_mtime = file_mtime_now
-            yield filepath
-        else:
-            await asyncio.sleep(period)
+        try:
+            file_mtime_now = filepath.stat().st_mtime
+            if file_mtime_now != file_mtime:
+                file_mtime = file_mtime_now
+                yield filepath
+            else:
+                await asyncio.sleep(period)
+        except raise_timeout_errors as e:
+            raise e
