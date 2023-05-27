@@ -22,6 +22,7 @@ pip install pyassorted
 - pyassorted.cache.cache
 - pyassorted.collections.sqlitedict
 - pyassorted.datetime
+- pyassorted.io.watch
 - pyassorted.lock.filelock
 
 
@@ -137,6 +138,25 @@ print(round(timer.read()))  # 1
 with timer:
     time.sleep(1)
 print(round(timer.read()))  # 1
+```
+
+### pyassorted.io.watch ###
+
+```python
+import asyncio
+from pyassorted.io import async_watch, watch
+
+def watch_file(filepath):
+    for file in watch(filepath):
+        print("File changed!")
+
+async def async_watch_file(filepath):
+    async for file in async_watch(filepath):
+        print("File changed!")
+
+filepath = "modifying_file.txt"
+watch_file(filepath)
+async_watch_file(filepath)
 ```
 
 ### pyassorted.lock ###
