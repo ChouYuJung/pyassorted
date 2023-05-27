@@ -7,15 +7,15 @@ from typing import AsyncGenerator, Generator, Text, Union
 PathText = Union[Path, Text]
 
 
-def watch(filepath: PathText, frequency: float = 0.1) -> Generator[Path, None, None]:
+def watch(filepath: PathText, period: float = 0.1) -> Generator[Path, None, None]:
     """Watch a file for changes.
 
     Parameters
     ----------
     filepath : PathText
         Path to file to watch.
-    frequency : float, optional
-        Frequency to check for changes, by default 0.1
+    period : float, optional
+        period to check for changes, by default 0.1
 
     Yields
     ------
@@ -40,11 +40,11 @@ def watch(filepath: PathText, frequency: float = 0.1) -> Generator[Path, None, N
             file_mtime = file_mtime_now
             yield filepath
         else:
-            time.sleep(frequency)
+            time.sleep(period)
 
 
 async def async_watch(
-    filepath: PathText, frequency: float = 0.1
+    filepath: PathText, period: float = 0.1
 ) -> AsyncGenerator[Path, None]:
     """Watch a file for changes.
 
@@ -52,8 +52,8 @@ async def async_watch(
     ----------
     filepath : PathText
         Path to file to watch.
-    frequency : float, optional
-        Frequency to check for changes, by default 0.1
+    period : float, optional
+        period to check for changes, by default 0.1
 
     Examples
     --------
@@ -76,4 +76,4 @@ async def async_watch(
             file_mtime = file_mtime_now
             yield filepath
         else:
-            await asyncio.sleep(frequency)
+            await asyncio.sleep(period)
