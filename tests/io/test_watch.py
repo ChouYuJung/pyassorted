@@ -1,3 +1,4 @@
+import asyncio
 import concurrent.futures
 import math
 import pytest
@@ -6,6 +7,7 @@ import tempfile
 import time
 from pathlib import Path
 
+from pyassorted.asyncio import run_func
 from pyassorted.io import async_watch, watch
 
 
@@ -88,3 +90,31 @@ async def test_async_watch(temp_dir: Path):
     assert temp_dir.exists()
     filepath = temp_dir.joinpath("test.txt")
     filepath.touch()
+
+    test_times = 3
+    write_wait = 0.1
+    write_period = 0.1
+    watch_period = 0.01
+
+    watch_task = asyncio.Task(
+        async_watch_count(filepath, period=watch_period, watch_times=test_times)
+    )
+    write_task = asyncio.Task(
+        run_func(
+            write_empty,
+            filepath,
+            wait_start=write_wait,
+            period=write_period,
+            write_times=test_times,
+        )
+    )
+    results = await asyncio.wait_for(
+        asyncio.gather(
+            *[
+                watch_task,
+                write_task,
+            ]
+        ),
+        timeout=math.ceil(test_times * write_period + write_wait + 1),
+    )
+    assert results[0] == test_times

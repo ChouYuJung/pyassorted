@@ -53,7 +53,10 @@ def watch(
 async def async_watch(
     filepath: PathText,
     period: float = 0.1,
-    raise_timeout_errors: Tuple = (TimeoutError,),
+    raise_timeout_errors: Tuple = (
+        TimeoutError,
+        asyncio.exceptions.TimeoutError,
+    ),
 ) -> AsyncGenerator[Path, None]:
     """Watch a file for changes.
 
