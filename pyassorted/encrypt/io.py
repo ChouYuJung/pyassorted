@@ -44,6 +44,19 @@ def decode_file(
     return decoded_content
 
 
+class FileEncoder:
+    def __init__(self, password: Text):
+        self.__password = password
+
+    def encode(self, raw_file_path: Text, encode_file_path: Text) -> Text:
+        return encode_file(raw_file_path, encode_file_path, self.__password)
+
+    def decode(
+        self, encode_file_path: Text, decode_file_path: Optional[Text] = None
+    ) -> bytes:
+        return decode_file(encode_file_path, self.__password, decode_file_path)
+
+
 if __name__ == "__main__":
     raw_file_path = "/tmp/test.txt"
     encode_file_path = "/tmp/test.txt.enc"
