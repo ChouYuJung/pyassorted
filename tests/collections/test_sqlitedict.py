@@ -9,14 +9,26 @@ async def test_sqlite_dict():
     cache = SqliteDict()
     assert len(cache) == 0
 
-    # Basic Operations
     cache[key] = 1
+
+    # Get Operations
     assert len(cache) == 1
     assert cache[key] == 1
     assert cache.get(key) == 1
     assert cache.get("NO_KEY") == None
     assert cache.get("NO_KEY", "DEFAULT") == "DEFAULT"
 
+    # Pop Operations
+    _value = cache.pop(key)
+    assert _value == 1
+    assert len(cache) == 0
+    cache[key] = _value
+
+    # Contains Operations
+    assert key in cache
+    assert "NO_KEY" not in cache
+
+    # Set Operations
     cache.set(key, 2.0)
     assert cache.get(key) == 2.0
 
@@ -35,6 +47,10 @@ async def test_sqlite_dict():
         assert False
     except TypeError:
         pass
+
+    # Delete Operations
+    del cache[key]
+    assert key not in cache
 
 
 def test_sqlite_iteration():

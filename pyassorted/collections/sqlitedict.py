@@ -75,6 +75,19 @@ class SqliteDict(object):
         for row in self._cursor:
             yield (row[0], pickle.loads(row[1]))
 
+    def __contains__(self, key: PrimitiveType) -> bool:
+        self.validate_key(key=key)
+        self._cursor.execute(
+            f"SELECT COUNT(*) FROM {self._tablename} WHERE key=?", (key,)
+        )
+        return self._cursor.fetchone()[0] > 0
+
+    def __delitem__(self, key: PrimitiveType):
+        self.validate_key(key=key)
+        self._cursor.execute(f"DELETE FROM {self._tablename} WHERE key=?", (key,))
+        if self.auto_commit:
+            self.commit()
+
     def set(self, key: PrimitiveType, value: Any):
         self[key] = value
 
@@ -82,6 +95,14 @@ class SqliteDict(object):
         self.validate_key(key=key)
         try:
             return self[key]
+        except KeyError:
+            return default
+
+    def pop(self, key: PrimitiveType, default: Any = None) -> Any:
+        try:
+            value = self[key]
+            del self[key]
+            return value
         except KeyError:
             return default
 
