@@ -30,10 +30,16 @@ class SqliteDict(object):
     """
 
     def __init__(
-        self, sqlite_filepath: Text = ":memory:", tablename: Text = "cache", **kwargs
+        self,
+        sqlite_filepath: Text = ":memory:",
+        tablename: Text = "cache",
+        auto_commit: bool = True,
+        **kwargs,
     ):
         self._sqlite_filepath = sqlite_filepath
         self._tablename = tablename
+        self.auto_commit = auto_commit
+
         self._conn = sqlite3.connect(self._sqlite_filepath, check_same_thread=False)
         self._cursor = self._conn.cursor()
         self._cursor.execute(
@@ -61,6 +67,8 @@ class SqliteDict(object):
             f"INSERT OR REPLACE INTO {self._tablename} (key, value) VALUES (?, ?)",
             (key, value_bytes),
         )
+        if self.auto_commit:
+            self.commit()
 
     def __iter__(self):
         self._cursor.execute(f"SELECT key, value FROM {self._tablename}")
@@ -77,11 +85,16 @@ class SqliteDict(object):
         except KeyError:
             return default
 
+    def commit(self):
+        self._conn.commit()
+
     def items(self):
         return self.__iter__()
 
     async def async_set(self, key: PrimitiveType, value: Any):
         await run_func(self.set, key=key, value=value)
+        if self.auto_commit:
+            await run_func(self.commit)
 
     async def async_get(self, key: PrimitiveType):
         return await run_func(self.get, key=key)
