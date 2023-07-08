@@ -62,6 +62,11 @@ class SqliteDict(object):
             (key, value_bytes),
         )
 
+    def __iter__(self):
+        self._cursor.execute(f"SELECT key, value FROM {self._tablename}")
+        for row in self._cursor:
+            yield (row[0], pickle.loads(row[1]))
+
     def set(self, key: PrimitiveType, value: Any):
         self[key] = value
 
@@ -71,6 +76,9 @@ class SqliteDict(object):
             return self[key]
         except KeyError:
             return default
+
+    def items(self):
+        return self.__iter__()
 
     async def async_set(self, key: PrimitiveType, value: Any):
         await run_func(self.set, key=key, value=value)

@@ -35,3 +35,16 @@ async def test_sqlite_dict():
         assert False
     except TypeError:
         pass
+
+
+def test_sqlite_iteration():
+    d = {"a": 1, "b": 2, "c": 3}
+    cache = SqliteDict()
+
+    for k, v in d.items():
+        cache[k] = v
+
+    assert len(cache) == len(d)
+
+    for k, v in cache:
+        assert d[k] == v
