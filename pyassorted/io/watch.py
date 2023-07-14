@@ -3,7 +3,6 @@ import time
 from pathlib import Path
 from typing import AsyncGenerator, Generator, Text, Tuple, Union
 
-
 PathText = Union[Path, Text]
 
 

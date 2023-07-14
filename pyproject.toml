@@ -18,6 +18,7 @@ flake9 = "*"
 pytest = "*"
 pytest-asyncio = "*"
 yapf = "*"
+isort = "*"
 
 [tool.poetry.group.doc.dependencies]
 sphinx = "*"
