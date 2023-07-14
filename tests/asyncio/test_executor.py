@@ -1,6 +1,7 @@
 import asyncio
-import pytest
 from typing import Any
+
+import pytest
 
 from pyassorted.asyncio import run_func
 

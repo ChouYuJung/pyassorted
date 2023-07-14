@@ -5,7 +5,6 @@ from typing import Any, Text, Union
 
 from pyassorted.asyncio.executor import run_func
 
-
 PrimitiveType = Union[str, numbers.Number]
 
 

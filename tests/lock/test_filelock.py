@@ -7,8 +7,8 @@ from multiprocessing.managers import ValueProxy
 from typing import Dict, Optional
 
 import pytest
-from pyassorted.lock import FileLock
 
+from pyassorted.lock import FileLock
 
 max_workers = 4
 mp_ctx_method = "fork" if platform.processor() == "arm" else None

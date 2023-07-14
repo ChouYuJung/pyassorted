@@ -8,7 +8,6 @@ import pytest
 
 from pyassorted.asyncio.io import aio_open
 
-
 target_filename = "test_io.txt"
 test_filename = "test_aio.txt"
 

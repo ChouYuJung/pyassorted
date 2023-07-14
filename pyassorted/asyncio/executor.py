@@ -1,11 +1,11 @@
 import asyncio
-import functools
 import concurrent.futures
+import functools
 from typing import Awaitable, Callable, Union
+
 from typing_extensions import ParamSpec, TypeVar
 
 from pyassorted.asyncio.utils import is_coro_func
-
 
 T = TypeVar("T")
 P = ParamSpec("P")

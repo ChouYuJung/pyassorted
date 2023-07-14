@@ -1,6 +1,7 @@
 import datetime
-import pytz
 from typing import Text, Union
+
+import pytz
 
 
 def aware_datetime_now(

@@ -5,7 +5,6 @@ from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar, Union
 
 from pyassorted.asyncio import is_coro_func
 
-
 KeyType = TypeVar("KeyType")
 ValueType = TypeVar("ValueType")
 EmptyType = TypeVar("EmptyType")

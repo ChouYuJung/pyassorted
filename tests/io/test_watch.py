@@ -1,11 +1,12 @@
 import asyncio
 import concurrent.futures
 import math
-import pytest
 import signal
 import tempfile
 import time
 from pathlib import Path
+
+import pytest
 
 from pyassorted.asyncio import run_func
 from pyassorted.io import async_watch, watch

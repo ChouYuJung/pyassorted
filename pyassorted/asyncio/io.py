@@ -1,6 +1,6 @@
 import asyncio
 from pathlib import Path
-from typing import Iterable, List, Optional, Text, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, List, Optional, Text
 
 from pyassorted.asyncio import run_func
 

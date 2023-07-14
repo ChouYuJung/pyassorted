@@ -1,8 +1,8 @@
 import asyncio
 import functools
 from typing import Awaitable, Callable, Union
-from typing_extensions import ParamSpec, TypeVar
 
+from typing_extensions import ParamSpec, TypeVar
 
 T = TypeVar("T")
 P = ParamSpec("P")
