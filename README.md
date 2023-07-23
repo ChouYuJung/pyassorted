@@ -1,4 +1,5 @@
 # pyassorted #
+[![CircleCI](https://circleci.com/gh/dockhardman/pyassorted.svg?style=shield)](https://circleci.com/gh/dockhardman/pyassorted)
 
 A library has assorted utils in Pure-Python. There are 3 principles:
 
