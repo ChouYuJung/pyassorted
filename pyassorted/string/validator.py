@@ -1,4 +1,5 @@
 import re
+import uuid
 from typing import Sequence, Text
 
 
@@ -47,3 +48,15 @@ def decode_text_bytes(
         file_content = file_content.replace("\xa0", " ")
         file_content = file_content.strip()
     return file_content
+
+
+def validate_uuid(uuid_string: Text, version: int = 4) -> bool:
+    """Checks if a UUID string is valid."""
+
+    uuid_string = uuid_string.lower()
+    try:
+        uuid_obj = uuid.UUID(uuid_string, version=version)
+    except ValueError:
+        return False
+
+    return str(uuid_obj) == uuid_string
