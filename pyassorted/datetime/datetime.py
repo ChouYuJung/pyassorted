@@ -40,3 +40,43 @@ def iso_datetime_now(tz: Union[Text, "pytz.BaseTzInfo"] = pytz.UTC) -> Text:
     """
 
     return aware_datetime_now(tz).isoformat()
+
+
+def to_timezone(
+    value: Union[Text, "pytz.BaseTzInfo", "datetime.timezone"]
+) -> "datetime.timezone":
+    """Convert a timezone value to a datetime.timezone object.
+
+    Parameters
+    ----------
+    value : Union[Text, pytz.BaseTzInfo, datetime.timezone]
+        The timezone value.
+
+    Returns
+    -------
+    datetime.timezone
+        The timezone as a datetime.timezone object.
+    """
+
+    if isinstance(value, Text):
+        try:
+            tzinfo = datetime.datetime.fromisoformat(value).tzinfo
+
+        except ValueError:
+            try:
+                tzinfo = datetime.timezone(
+                    datetime.datetime.now(pytz.timezone(value)).utcoffset()
+                )
+
+            except Exception:
+                raise ValueError(f"Invalid timezone value: {value}")
+
+    elif isinstance(value, pytz.BaseTzInfo):
+        tzinfo = datetime.timezone(datetime.now(value).utcoffset())
+
+    elif isinstance(value, datetime.timezone):
+        tzinfo = value
+    else:
+        raise ValueError(f"Invalid timezone value: {value}")
+
+    return tzinfo
