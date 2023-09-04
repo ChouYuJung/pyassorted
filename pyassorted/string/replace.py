@@ -45,13 +45,13 @@ def multiple_replace(
     """
 
     if wraped_by is Bracket.NoBracket:
-        regex = re.compile("%s" % "|".join(map(re.escape, d.keys())))
+        regex = re.compile(r"%s" % "|".join(map(re.escape, d.keys())))
     elif wraped_by is Bracket.Parenthesis:
-        regex = re.compile("\(\s*(%s)\s*\)" % "|".join(map(re.escape, d.keys())))
+        regex = re.compile(r"\(\s*(%s)\s*\)" % "|".join(map(re.escape, d.keys())))
     elif wraped_by is Bracket.SquareBrackets:
-        regex = re.compile("\[\s*(%s)\s*\]" % "|".join(map(re.escape, d.keys())))
+        regex = re.compile(r"\[\s*(%s)\s*\]" % "|".join(map(re.escape, d.keys())))
     elif wraped_by is Bracket.CurlyBrackets:
-        regex = re.compile("{\s*(%s)\s*}" % "|".join(map(re.escape, d.keys())))
+        regex = re.compile(r"{\s*(%s)\s*}" % "|".join(map(re.escape, d.keys())))
     else:
         raise ValueError(f"Invalid Bracket type: {wraped_by}")
 
