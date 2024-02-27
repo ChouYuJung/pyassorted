@@ -1,7 +1,7 @@
 import asyncio
 import concurrent.futures
 import functools
-from typing import Awaitable, Callable, Union
+from typing import Awaitable, Callable, Union, cast
 
 from typing_extensions import ParamSpec, TypeVar
 
@@ -44,6 +44,7 @@ async def run_func(
 
     if is_coro_func(func):
         partial_func = functools.partial(func, *args, **kwargs)
+        partial_func = cast(Callable[[], Awaitable[T]], partial_func)
         output = await partial_func()
 
     else:
@@ -52,4 +53,5 @@ async def run_func(
             partial_func = functools.partial(func, *args, **kwargs)
             output = await loop.run_in_executor(pool, partial_func)
 
+    output = cast(T, output)
     return output
