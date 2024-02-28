@@ -1,7 +1,16 @@
 import asyncio
 import concurrent.futures
 import functools
-from typing import AsyncGenerator, Awaitable, Callable, Generator, Union, cast
+from typing import (
+    AsyncGenerator,
+    Awaitable,
+    Callable,
+    Generator,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
 
 from typing_extensions import ParamSpec, TypeVar
 
@@ -87,25 +96,30 @@ async def run_generator(
         raise ValueError(f"The {generator_func} is not callable.")
 
     loop = asyncio.get_running_loop()
-    queue = asyncio.Queue()
+    # queue = asyncio.Queue()
+    queue: "asyncio.Queue[Tuple[Optional[BaseException], Optional[T]]]" = (
+        asyncio.Queue()
+    )
 
     def producer():
-        for item in generator_func(*args, **kwargs):
-            future = asyncio.run_coroutine_threadsafe(queue.put(item), loop)
-            future.result()  # Wait for item to be added to the queue
-        future = asyncio.run_coroutine_threadsafe(
-            queue.put(None), loop
-        )  # Signal completion
-        future.result()
+        try:
+            for item in generator_func(*args, **kwargs):
+                loop.call_soon_threadsafe(queue.put_nowait, (None, item))
+            loop.call_soon_threadsafe(queue.put_nowait, (None, None))  # Signal success
+        except Exception as e:
+            loop.call_soon_threadsafe(queue.put_nowait, (e, None))  # Signal exception
 
     async def consumer():
         while True:
-            item = await queue.get()
-            if item is None:
-                break
-            yield item
+            exception, value = await queue.get()
+            if exception is not None:
+                raise exception  # Raise the caught exception in the async context
+            if value is None:
+                return
+            yield value
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
-        loop.run_in_executor(pool, producer)
+        producer_future = loop.run_in_executor(pool, producer)
         async for item in consumer():
             yield item
+        await producer_future
