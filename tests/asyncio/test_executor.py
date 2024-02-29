@@ -139,15 +139,15 @@ class AsyncSampleGeneratorClass:
     "generator_func,count",
     [
         (normal_generator, 10),
-        # (async_generator, 10),
+        (async_generator, 10),
         (SampleGeneratorClass(), 10),
         (SampleGeneratorClass.class_method, 10),
         (SampleGeneratorClass().normal_method, 10),
         (SampleGeneratorClass.static_method, 10),
         # (AsyncSampleGeneratorClass(), 10),
-        # (AsyncSampleGeneratorClass.class_method, 10),
-        # (AsyncSampleGeneratorClass().normal_method, 10),
-        # (AsyncSampleGeneratorClass.static_method, 10),
+        (AsyncSampleGeneratorClass.class_method, 10),
+        (AsyncSampleGeneratorClass().normal_method, 10),
+        (AsyncSampleGeneratorClass.static_method, 10),
     ],
 )
 async def test_run_generator(

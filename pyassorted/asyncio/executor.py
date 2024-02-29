@@ -1,6 +1,7 @@
 import asyncio
 import concurrent.futures
 import functools
+import inspect
 from typing import (
     AsyncGenerator,
     Awaitable,
@@ -67,6 +68,49 @@ async def run_func(
 
 
 async def run_generator(
+    generator_func: Union[
+        Callable[P, Generator[T, None, None]],
+        Callable[P, AsyncGenerator[T, None]],
+    ],
+    *args,
+    max_workers=1,
+    **kwargs,
+) -> AsyncGenerator[T, None]:
+    """Run a generator function in a thread pool or async generator function
+    and yield its results asynchronously.
+
+    Parameters
+    ----------
+    generator_func : Callable[P, Generator[T, None, None]]
+        The generator function.
+    max_workers : int, optional
+        The worker number of thread pool, by default 1
+
+    Yields
+    ------
+    T
+        Items yielded by the generator function.
+
+    Raises
+    ------
+    ValueError
+        If the input is not callable.
+    """
+
+    if not callable(generator_func):
+        raise ValueError(f"The {generator_func} is not callable.")
+    elif inspect.isasyncgenfunction(generator_func):
+        async for item in generator_func(*args, **kwargs):
+            yield item
+    else:
+        generator_func = cast(Callable[P, Generator[T, None, None]], generator_func)
+        async for item in run_generator_thread_pool(
+            generator_func, *args, max_workers=max_workers, **kwargs
+        ):
+            yield item
+
+
+async def run_generator_thread_pool(
     generator_func: Callable[P, Generator[T, None, None]],
     *args,
     max_workers=1,
@@ -92,11 +136,7 @@ async def run_generator(
         If the input is not callable.
     """
 
-    if not callable(generator_func):
-        raise ValueError(f"The {generator_func} is not callable.")
-
     loop = asyncio.get_running_loop()
-    # queue = asyncio.Queue()
     queue: "asyncio.Queue[Tuple[Optional[BaseException], Optional[T]]]" = (
         asyncio.Queue()
     )
