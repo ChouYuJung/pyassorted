@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, AsyncGenerator, Awaitable, Callable, Generator, Union
+from typing import Any, AsyncGenerator, Callable, Generator
 
 import pytest
 from typing_extensions import ParamSpec, TypeVar
@@ -157,3 +157,33 @@ async def test_run_generator(
     async for i in run_generator(generator_func, count):
         returns.append(i)
     assert returns == list(range(count))
+
+
+@pytest.mark.asyncio
+async def test_run_generator_errors():
+    def normal_gen(count: int) -> Generator[int, None, None]:
+        for i in range(count):
+            if i == 5:
+                raise ValueError("Error")
+            yield i
+
+    async def async_gen(count: int) -> AsyncGenerator[int, None]:
+        for i in range(count):
+            if i == 5:
+                raise ValueError("Error")
+            yield i
+
+    def normal_function(count: int) -> int:
+        return count
+
+    with pytest.raises(ValueError):
+        async for _ in run_generator(normal_gen, 10):
+            pass
+
+    with pytest.raises(ValueError):
+        async for _ in run_generator(async_gen, 10):
+            pass
+
+    with pytest.raises(ValueError):
+        async for _ in run_generator(normal_function):  # type: ignore
+            pass
