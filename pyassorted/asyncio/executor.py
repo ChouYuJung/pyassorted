@@ -99,15 +99,34 @@ async def run_generator(
 
     if not callable(generator_func):
         raise ValueError(f"The {generator_func} is not callable.")
+    # Async generator function
     elif inspect.isasyncgenfunction(generator_func):
         async for item in generator_func(*args, **kwargs):
             yield item
-    else:
+    # Generator function
+    elif inspect.isgeneratorfunction(generator_func):
         generator_func = cast(Callable[P, Generator[T, None, None]], generator_func)
         async for item in run_generator_thread_pool(
             generator_func, *args, max_workers=max_workers, **kwargs
         ):
             yield item
+    # Instance with __call__ method
+    elif hasattr(generator_func, "__call__"):
+        # __call__ method is an async generator function
+        if inspect.isasyncgenfunction(generator_func.__call__):
+            async for item in generator_func.__call__(*args, **kwargs):
+                yield item
+        # __call__ method is a generator function
+        elif inspect.isgeneratorfunction(generator_func.__call__):
+            generator_func = cast(Callable[P, Generator[T, None, None]], generator_func)
+            async for item in run_generator_thread_pool(
+                generator_func.__call__, *args, max_workers=max_workers, **kwargs
+            ):
+                yield item
+        else:
+            raise ValueError(f"The {generator_func} is not a generator function.")
+    else:
+        raise ValueError(f"The {generator_func} is not a generator function.")
 
 
 async def run_generator_thread_pool(

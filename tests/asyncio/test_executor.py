@@ -144,7 +144,7 @@ class AsyncSampleGeneratorClass:
         (SampleGeneratorClass.class_method, 10),
         (SampleGeneratorClass().normal_method, 10),
         (SampleGeneratorClass.static_method, 10),
-        # (AsyncSampleGeneratorClass(), 10),
+        (AsyncSampleGeneratorClass(), 10),
         (AsyncSampleGeneratorClass.class_method, 10),
         (AsyncSampleGeneratorClass().normal_method, 10),
         (AsyncSampleGeneratorClass.static_method, 10),
