@@ -4,7 +4,7 @@ description = "A library has light-weight assorted utils in Prue-Python."
 license = "MIT"
 name = "pyassorted"
 readme = "README.md"
-version = "0.7.8"
+version = "0.8.0"
 
 [tool.poetry.dependencies]
 python = ">=3.7.0, <4.0.0"
