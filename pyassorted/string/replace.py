@@ -61,3 +61,31 @@ def multiple_replace(
         return regex.sub(lambda mo: d[mo.group().strip("[] \t\n\r")], text)
     else:
         return regex.sub(lambda mo: d[mo.group().strip("{} \t\n\r")], text)
+
+
+def limit_consecutive_newlines(text: Text, max_newlines: int = 2) -> Text:
+    """Limit consecutive newlines in a string.
+
+    Parameters
+    ----------
+    text : Text
+        Input text with newlines.
+    max_newlines : int, optional
+        Maximum number of consecutive newlines allowed. The default is 2.
+
+    Returns
+    -------
+    Text
+        Text with limited consecutive newlines.
+
+    Examples
+    --------
+    >>> text = "Hello\n\n\n\n\nWorld"
+    >>> limit_consecutive_newlines(text)
+    'Hello\n\nWorld'
+    """
+
+    # Creating a regex pattern to match more than `max_newlines` newlines
+    pattern = r"\n{" + str(max_newlines + 1) + ",}"
+    # Replace found patterns with `max_newlines` amount of newline characters
+    return re.sub(pattern, "\n" * max_newlines, text)

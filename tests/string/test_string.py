@@ -3,7 +3,13 @@ from typing import Dict, List, Optional, Text
 
 import pytest
 
-from pyassorted.string import Bracket, find_placeholders, multiple_replace, rand_str
+from pyassorted.string import (
+    Bracket,
+    find_placeholders,
+    limit_consecutive_newlines,
+    multiple_replace,
+    rand_str,
+)
 
 
 @pytest.mark.parametrize(
@@ -89,3 +95,43 @@ def test_find_placeholders(
         close_delim=close_delim or "}",
     )
     assert result == expected_output, f"Expected {expected_output}, but got {result}"
+
+
+@pytest.mark.parametrize(
+    "text, max_newlines, expected_output",
+    [
+        (
+            "Hello\n\n\n\nWorld",
+            2,
+            "Hello\n\nWorld",
+        ),  # More than 2 newlines reduced to 2
+        (
+            "Line 1\nLine 2\n\n\nLine 3",
+            1,
+            "Line 1\nLine 2\nLine 3",
+        ),  # More than 1 newline reduced to 1
+        ("\n\n\n", 1, "\n"),  # Text consisting only of newlines
+        ("Single line", 2, "Single line"),  # No newlines to reduce
+        (
+            "End with newlines\n\n\n",
+            2,
+            "End with newlines\n\n",
+        ),  # Newlines at the end of text
+        (
+            "\n\nStart with newlines",
+            2,
+            "\n\nStart with newlines",
+        ),  # Newlines at the start of text
+        ("", 2, ""),  # Empty input
+        (
+            "Normal text\n\nNormal text",
+            2,
+            "Normal text\n\nNormal text",
+        ),  # Exactly max_newlines newlines
+    ],
+)
+def test_limit_consecutive_newlines(text, max_newlines, expected_output):
+    result = limit_consecutive_newlines(text, max_newlines)
+    assert (
+        result == expected_output
+    ), f"Expected '{expected_output}', but got '{result}'"
