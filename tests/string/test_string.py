@@ -5,6 +5,7 @@ import pytest
 
 from pyassorted.string import (
     Bracket,
+    extract_code_blocks,
     find_placeholders,
     limit_consecutive_newlines,
     multiple_replace,
@@ -132,6 +133,41 @@ def test_find_placeholders(
 )
 def test_limit_consecutive_newlines(text, max_newlines, expected_output):
     result = limit_consecutive_newlines(text, max_newlines)
+    assert (
+        result == expected_output
+    ), f"Expected '{expected_output}', but got '{result}'"
+
+
+@pytest.mark.parametrize(
+    "text, language, expected_output",
+    [
+        ("No code here.", "json", []),
+        ('Simple ```json\n{"key": "value"}``` block.', "json", ['{"key": "value"}']),
+        (
+            'Two blocks ```json\n{"first": 1}``` and ```json\n{"second": 2}```.',
+            "json",
+            ['{"first": 1}', '{"second": 2}'],
+        ),
+        ('Nested ```json\n{"key": ```not a block```}``` outer.', "json", ['{"key": ']),
+        (
+            '```json\n{"key": "value"}\n{"another": "item"}```',
+            "json",
+            ['{"key": "value"}\n{"another": "item"}'],
+        ),
+        ('Mismatched ```json{"data": "none"} ```', "json", []),
+        ("Check lang ```yml\n- item: value\n```", "yml", ["- item: value\n"]),
+        ("Partial match ```go package main``` is not a block.", "go", []),
+        ("Correct newline but no content ```go\n```.", "go", [""]),
+        (
+            "Content with newline after lang ```go\npackage main\nfunc main() {}```",
+            "go",
+            ["package main\nfunc main() {}"],
+        ),
+        ("No end marker ```go\npackage main\nfunc main() {}", "go", []),
+    ],
+)
+def test_extract_code_blocks(text, language, expected_output):
+    result = extract_code_blocks(text, language)
     assert (
         result == expected_output
     ), f"Expected '{expected_output}', but got '{result}'"
