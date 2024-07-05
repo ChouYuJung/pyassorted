@@ -31,7 +31,9 @@ def find_placeholders(
     return re.findall(pattern, text)
 
 
-def extract_code_blocks(text: Text, language: Text) -> List[Text]:
+def extract_code_blocks(
+    text: Text, language: Text, eob_missing_ok: bool = False
+) -> List[Text]:
     """Extract code blocks for specified languages from a text.
 
     Parameters
@@ -52,6 +54,16 @@ def extract_code_blocks(text: Text, language: Text) -> List[Text]:
     ['{"key": "value"}']
     """
 
-    # Pattern to find blocks that start with ```<language>\n and end with ```
-    pattern = rf"```{language.strip()}\n(.*?)(?=```)"
-    return re.findall(pattern, text, flags=re.DOTALL)
+    if eob_missing_ok is True:
+        bob = f"```{language.strip()}\n"
+        eob = "\n```"
+        _text_parts = text.split(bob)
+        if len(_text_parts) == 1:
+            return []
+        return [_text_parts[-1].split(eob)[0]]
+
+    else:
+        # Pattern to find blocks that start with ```<language>\n and end with ```
+        pattern = rf"```{language.strip()}\n(.*?)(?=```)"
+        # pattern = rf"```.*?\n(.*?)(?=```)"
+        return re.findall(pattern, text, flags=re.DOTALL)
