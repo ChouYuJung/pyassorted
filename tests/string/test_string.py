@@ -164,10 +164,16 @@ def test_limit_consecutive_newlines(text, max_newlines, expected_output):
             ["package main\nfunc main() {}"],
         ),
         ("No end marker ```go\npackage main\nfunc main() {}", "go", []),
+        (
+            "No end marker (eob_missing_ok=true) ```go\npackage main\nfunc main() {}",
+            "go",
+            ["package main\nfunc main() {}"],
+        ),
     ],
 )
 def test_extract_code_blocks(text, language, expected_output):
-    result = extract_code_blocks(text, language)
+    eob_missing_ok = True if "eob_missing_ok=true" in text.casefold() else False
+    result = extract_code_blocks(text, language, eob_missing_ok=eob_missing_ok)
     assert (
         result == expected_output
     ), f"Expected '{expected_output}', but got '{result}'"
