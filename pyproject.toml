@@ -21,7 +21,7 @@ pytest = "*"
 pytest-asyncio = "*"
 yapf = "*"
 
-[tool.poetry.group.doc.dependencies]
+[tool.poetry.group.docs.dependencies]
 sphinx = "*"
 
 [tool.isort]
