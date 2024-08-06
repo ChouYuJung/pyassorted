@@ -1,6 +1,6 @@
 # Developing
 install-all:
-	poetry install --with dev
+	poetry install --with dev --with docs
 
 format-code:
 	isort . --skip docs && black . --exclude docs
