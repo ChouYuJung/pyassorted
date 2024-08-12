@@ -21,7 +21,20 @@ def _read_file(file_path: Text) -> Text:
 def read_py_module(
     module_path: Text, excludes: Optional[Set[Text]] = None
 ) -> Optional[ModuleParam]:
-    """Read the module source code."""
+    """Read the module source code.
+
+    Parameters
+    ----------
+    module_path : Text
+        The module path.
+    excludes : Optional[Set[Text]], optional
+        The exclude module set, by default None
+
+    Returns
+    -------
+    Optional[ModuleParam]
+        The module
+    """
 
     if excludes is not None and module_path in excludes:
         return None
@@ -48,7 +61,20 @@ def read_py_module(
 def read_module_with_dependencies(
     module_path: Text, filter: Optional[Callable[[Text], bool]] = None
 ) -> List[ModuleParam]:
-    """Read the module source code."""
+    """Read the module source code.
+
+    Parameters
+    ----------
+    module_path : Text
+        The module path.
+    filter : Optional[Callable[[Text], bool]], optional
+        The filter function, by default None
+
+    Returns
+    -------
+    List[ModuleParam]
+        The module
+    """
 
     modules: List[ModuleParam] = []
     walked_modules = set()
@@ -63,6 +89,8 @@ def read_module_with_dependencies(
 
     # Read the dependencies
     for dep_name in sys.modules.keys():
+        if filter is not None and not filter(dep_name):
+            continue
         depend_module_param = read_py_module(dep_name, excludes=walked_modules)
         if depend_module_param is not None:
             modules.append(depend_module_param)
