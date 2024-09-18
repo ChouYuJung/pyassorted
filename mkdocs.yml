@@ -1,0 +1,56 @@
+site_name: Pyassorted
+repo_url: https://github.com/dockhardman/pyassorted
+repo_name: pyassorted
+edit_uri: src/master/docs/
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/bitbucket
+    edit: material/pencil
+    view: material/eye
+  palette:
+    scheme: default
+    primary: blue
+    accent: blue
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+  features:
+    - content.action.edit
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - navigation.path
+    - navigation.tabs
+    - navigation.top
+    - toc.follow
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.critic:
+      mode: view
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+plugins:
+  - search
+  - render_swagger:
+      allow_arbitrary_locations: true
+  - neoteroi.mkdocsoad
+  - mkdocs-nav-weight

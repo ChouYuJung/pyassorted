@@ -14,15 +14,18 @@ typing-extensions = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
+faker = "*"
 flake8 = "*"
 flake9 = "*"
 isort = "*"
+mkdocs-material = "9.*"
+mkdocs-nav-weight = "*"
+mkdocs-render-swagger-plugin = "*"
+neoteroi-mkdocs = "*"
+poetry-plugin-export = "*"
 pytest = "*"
 pytest-asyncio = "*"
 yapf = "*"
-
-[tool.poetry.group.docs.dependencies]
-sphinx = "*"
 
 [tool.isort]
 profile = "black"
