@@ -108,3 +108,57 @@ asyncio.run(main())
 ```
 
 These utility functions make it easier to work with both synchronous and asynchronous code in an asynchronous context, providing a unified interface for execution and simplifying the integration of different types of functions in your asyncio-based applications.
+
+## run_generator_thread_pool
+
+```python
+async def run_generator_thread_pool(
+    generator_func: Callable[P, Generator[T, None, None]],
+    *args,
+    max_workers=1,
+    **kwargs,
+) -> AsyncGenerator[T, None]:
+```
+
+This function runs a generator function in a thread pool and yields its results asynchronously. It's particularly useful when you need to run a synchronous generator function in an asynchronous context.
+
+### `run_generator_thread_pool` Parameters
+
+- `generator_func`: The generator function to be executed.
+- `*args`: Positional arguments to be passed to the generator function.
+- `max_workers`: The maximum number of workers in the thread pool (default is 1).
+- `**kwargs`: Keyword arguments to be passed to the generator function.
+
+### `run_generator_thread_pool` Yields
+
+Items yielded by the generator function.
+
+### `run_generator_thread_pool` Raises
+
+- `ValueError`: If the input is not callable or not a generator function.
+
+### `run_generator_thread_pool` Example
+
+```python
+import asyncio
+from pyassorted.asyncio import run_generator_thread_pool
+
+def sync_generator(count: int):
+    for i in range(count):
+        yield i
+
+async def main():
+    async for item in run_generator_thread_pool(sync_generator, 5):
+        print(item)
+
+asyncio.run(main())
+```
+
+This function is particularly useful when you have a synchronous generator that you want to use in an asynchronous context. It runs the generator in a separate thread, allowing your async code to continue executing while the generator produces values.
+
+The `run_generator_thread_pool` function uses a producer-consumer pattern:
+
+1. The producer runs the generator function in a separate thread.
+2. The consumer asynchronously yields the items produced by the generator.
+
+This approach allows for efficient execution of synchronous generators in asynchronous code, preventing blocking of the event loop.
