@@ -9,6 +9,7 @@ version = "0.10.0"
 [tool.poetry.dependencies]
 aiohttp = "*"
 httpx = "*"
+jinja2 = "*"
 numpy = "^2"
 pydantic = { version = "^2", extras = ["email", "timezone"] }
 pydantic-settings = "*"
