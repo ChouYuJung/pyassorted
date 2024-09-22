@@ -1,4 +1,5 @@
 import re
+import string
 from enum import Enum
 from typing import Dict, Text
 
@@ -89,3 +90,21 @@ def limit_consecutive_newlines(text: Text, max_newlines: int = 2) -> Text:
     pattern = r"\n{" + str(max_newlines + 1) + ",}"
     # Replace found patterns with `max_newlines` amount of newline characters
     return re.sub(pattern, "\n" * max_newlines, text)
+
+
+def replace_right(source_str: Text, old: Text, new: Text, occurrence: int = -1) -> Text:
+    return source_str[::-1].replace(old[::-1], new[::-1], occurrence)[::-1]
+
+
+def str_strong_casefold(text: Text) -> Text:
+    return text.strip().replace("-_. ", "").casefold()
+
+
+def remove_punctuation(input_string: Text, extra_punctuation: Text = "") -> Text:
+    """Remove punctuations from the input string."""
+
+    extended_punctuation = (
+        string.punctuation + "，？！（）【】《》“”‘’；：" + extra_punctuation
+    )
+    translator = str.maketrans("", "", extended_punctuation)
+    return input_string.translate(translator)
