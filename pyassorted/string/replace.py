@@ -1,4 +1,5 @@
 import re
+import string
 from enum import Enum
 from typing import Dict, Text
 
@@ -89,3 +90,94 @@ def limit_consecutive_newlines(text: Text, max_newlines: int = 2) -> Text:
     pattern = r"\n{" + str(max_newlines + 1) + ",}"
     # Replace found patterns with `max_newlines` amount of newline characters
     return re.sub(pattern, "\n" * max_newlines, text)
+
+
+def replace_right(source_str: Text, old: Text, new: Text, occurrence: int = -1) -> Text:
+    """Replace the rightmost occurrence of a substring in a string.
+
+    Parameters
+    ----------
+    source_str : Text
+        The original string in which to replace the substring.
+    old : Text
+        The substring to be replaced.
+    new : Text
+        The substring to replace with.
+    occurrence : int, optional
+        The number of occurrences to replace from the right.
+        If -1 (default), all occurrences will be replaced.
+
+    Returns
+    -------
+    Text
+        The modified string with the specified replacements.
+
+    Examples
+    --------
+    >>> replace_right("Hello World, World", "World", "Universe", 1)
+    'Hello World, Universe'
+    >>> replace_right("Hello World, World", "World", "Universe")
+    'Hello Universe, Universe'
+    """
+
+    return source_str[::-1].replace(old[::-1], new[::-1], occurrence)[::-1]
+
+
+def replace_non_alphanumeric(text: Text) -> Text:
+    pattern = r"[^a-zA-Z0-9]"
+    return re.sub(pattern, "", text.casefold())
+
+
+def str_strong_casefold(text: Text) -> Text:
+    """Convert a string to a case-insensitive format.
+
+    Parameters
+    ----------
+    text : Text
+        The input string to be casefolded.
+
+    Returns
+    -------
+    Text
+        The casefolded string, with certain characters removed.
+
+    Examples
+    --------
+    >>> str_strong_casefold("Hello-World!")
+    'helloworld'
+    >>> str_strong_casefold("Python_Programming")
+    'pythonprogramming'
+    """
+
+    pattern = r"[^a-zA-Z0-9]"
+    return re.sub(pattern, "", text.casefold())
+
+
+def remove_punctuation(input_string: Text, extra_punctuation: Text = "") -> Text:
+    """Remove punctuation from a string.
+
+    Parameters
+    ----------
+    input_string : Text
+        The string from which to remove punctuation.
+    extra_punctuation : Text, optional
+        Additional punctuation characters to remove. The default is an empty string.
+
+    Returns
+    -------
+    Text
+        The string with punctuation removed.
+
+    Examples
+    --------
+    >>> remove_punctuation("Hello, World!")
+    'Hello World'
+    >>> remove_punctuation("Python: Programming; is fun!", ":;")
+    'Python Programming is fun'
+    """
+
+    extended_punctuation = (
+        string.punctuation + "，？！（）【】《》“”‘’；：" + extra_punctuation
+    )
+    translator = str.maketrans("", "", extended_punctuation)
+    return input_string.translate(translator)
