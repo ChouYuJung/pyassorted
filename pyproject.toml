@@ -7,6 +7,11 @@ readme = "README.md"
 version = "0.10.0"
 
 [tool.poetry.dependencies]
+aiohttp = "*"
+httpx = "*"
+numpy = "^2"
+pydantic = { version = "^2", extras = ["email", "timezone"] }
+pydantic-settings = "*"
 python = ">=3.10.0, <4.0.0"
 pytz = "*"
 rich = "*"
